@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.023 ;
+use IO::Compress::Base 2.024 ;
 
-use IO::Compress::Base::Common  2.023 qw(createSelfTiedObject);
+use IO::Compress::Base::Common  2.024 qw(createSelfTiedObject);
 use IO::Compress::Adapter::Lzma 2.006 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.023';
+$VERSION = '2.024';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -51,7 +51,7 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common  2.023 qw(:Parse);
+    use IO::Compress::Base::Common  2.024 qw(:Parse);
     
     return (
         'Filter'     => [0, 1, Parse_any,   [] ],
@@ -523,7 +523,11 @@ This parameter defaults to 0.
 
 =item C<< Filter => $filter >>
 
-TODO
+When present C< $filter > option must be an object of type C<Lzma::Filter::Lzma1>.
+See L</Lzma::Filter::Lzma> for a definition of C<Lzma::Filter::Lzma1>.
+
+If this option is not present an C<Lzma::Filter::Lzma1> object with default
+values will be used.
 
 =item C<< Strict => 0|1 >>
 
@@ -763,7 +767,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2009 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2010 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

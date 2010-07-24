@@ -60,10 +60,10 @@ MANIFEST
 private/MakeUtil.pm
 Changes
 pod/FAQ.pod
-examples/lzcat
-examples/lzgrep
-examples/lzstream
-examples/xzcat
-examples/xzgrep
-examples/xzstream
+examples/lzcat  perl
+examples/lzgrep perl
+examples/lzstream   perl
+examples/xzcat  perl
+examples/xzgrep perl
+examples/xzstream   perl
 META.yml                                 Module meta-data (added by MakeMaker)

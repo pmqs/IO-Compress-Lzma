@@ -14,6 +14,7 @@ use Test::More ;
 use CompTestUtils;
 
 my $LZMA ;
+my $UNLZMA ;
 
 sub ExternalLzmaWorks
 {
@@ -46,9 +47,9 @@ sub readWithLzma
 
     my $lex = new LexFile my $outfile;
 
-    my $comp = "$LZMA -dc" ;
+    my $comp = "$UNLZMA -c " ;
 
-    if (system("$comp $file >$outfile") == 0 )
+    if (system("$comp <$file >$outfile") == 0 )
     {
         $_[0] = readFile($outfile);
         return 1 ;
@@ -81,19 +82,26 @@ BEGIN
 {
 
     # Check external lzma is available
-    my $name = $^O =~ /mswin/i ? 'lzma.exe' : 'lzma';
+    my $nameLZ = $^O =~ /mswin/i ? 'lzma.exe' : 'lzma';
+    my $nameUNLZ = $^O =~ /mswin/i ? 'unlzma.exe' : 'unlzma';
     my $split = $^O =~ /mswin/i ? ";" : ":";
 
     for my $dir (reverse split $split, $ENV{PATH})    
     {
-        $LZMA = "$dir/$name"
-            if -x "$dir/$name" ;
+        $LZMA = "$dir/$nameLZ"
+            if -x "$dir/$nameLZ" ;
+
+        $UNLZMA = "$dir/$nameUNLZ"
+            if -x "$dir/$nameUNLZ" ;
     }
 
-    plan(skip_all => "Cannot find $name")
+    plan(skip_all => "Cannot find $nameLZ")
         if ! $LZMA ;
 
-    plan(skip_all => "$name doesn't work as expected")
+    plan(skip_all => "Cannot find $nameUNLZ")
+        if ! $UNLZMA ;
+
+    plan(skip_all => "$nameLZ doesn't work as expected")
         if ! ExternalLzmaWorks();
     
     # use Test::NoWarnings, if available

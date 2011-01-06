@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.030 ;
+use IO::Compress::Base 2.032 ;
 
-use IO::Compress::Base::Common  2.030 qw(createSelfTiedObject);
+use IO::Compress::Base::Common  2.032 qw(createSelfTiedObject);
 use IO::Compress::Adapter::Lzma 2.006 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.030';
+$VERSION = '2.032';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -51,7 +51,7 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common  2.030 qw(:Parse);
+    use IO::Compress::Base::Common  2.032 qw(:Parse);
     
     return (
         'Filter'     => [0, 1, Parse_any,   [] ],
@@ -767,7 +767,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2010 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2011 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

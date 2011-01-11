@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               IO-Compress-Lzma
-version:            2.032
+version:            2.033
 abstract:           Write lzma files/buffers
 author:
     - Paul Marquess <pmqs@cpan.org>
@@ -11,9 +11,9 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    Compress::Raw::Lzma:  2.032
-    IO::Compress::Base:   2.032
-    IO::Uncompress::Base:  2.032
+    Compress::Raw::Lzma:  2.033
+    IO::Compress::Base:   2.033
+    IO::Uncompress::Base:  2.033
 no_index:
     directory:
         - t

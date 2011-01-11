@@ -1,9 +1,9 @@
 CHANGES
 -------
 
-  2.032 4 Jan 2011
+  2.033 11 Jan 2011
 
-      * No Changes
+      * Made 001xz.t more forgiving when the tests run out of memory.
 
   2.030 22 July 2010
 

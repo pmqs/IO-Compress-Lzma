@@ -40,20 +40,28 @@ sub myXzReadFile
     my $filename = shift ;
     my $init = shift ;
 
-
     my $fil = new $UncompressClass $filename,
                                     -Strict   => 1,
                                     -Append   => 1
                                     ;
-
     my $data = '';
     $data = $init if defined $init ;
     1 while $fil->read($data) > 0;
+    my $status = $fil->error() . "" ;
     #ok ! $fil->error(), "  no error" 
     #    or diag "$$UnError " ;
 
     $fil->close ;
-    return $data ;
+    return ($status, $data) ;
+}
+
+sub memError
+{
+    my $err = shift ;
+    #my $re = "(" . LZMA_MEM_ERROR . "|" . LZMA_MEMLIMIT_ERROR . ")";
+    #my $re .= LZMA_MEM_ERROR;
+    my $re = "(Memory usage limit was reached|Cannot allocate memory)";
+    return $err =~/$re/ ;
 }
 
 
@@ -153,6 +161,9 @@ hello world
 this is a test
 EOM
 
+
+    # This set of tests can exhaust the memory on a syetem,
+    # so be forgiving if it runs out.
     for my $check (LZMA_CHECK_NONE, LZMA_CHECK_CRC32, LZMA_CHECK_CRC64, LZMA_CHECK_SHA256)
     {
         for my $extreme (0 .. 1)
@@ -162,18 +173,27 @@ EOM
                 title "$CompressClass - Check $check, Extreme $extreme, Preset $preset";
                 my $lex = new LexFile my $name ;
                 my $xz ;
-                $xz = new IO::Compress::Xz($name, 
-                                           Check => $check,
-                                           Extreme => $extreme,
-                                           Preset => $preset
-                                          )
-                    or diag $IO::Compress::Xz::XzError ;
-                ok $xz, "  xz object ok";
-                isa_ok $xz, "IO::Compress::Xz";
-                ok defined $xz->write($hello), "  wrote ok" ;
-                ok $xz->close(), "  closed ok";
+                SKIP:
+                {
+                    $xz = new IO::Compress::Xz($name, 
+                                               Check => $check,
+                                               Extreme => $extreme,
+                                               Preset => $preset
+                                              ) ;
+                    skip "Not enough memory - Check $check, Extreme $extreme, Preset $preset", 5
+                        if  memError($IO::Compress::Xz::XzError);
+                    
+                    ok $xz, "  xz object ok";
+                    isa_ok $xz, "IO::Compress::Xz";
+                    my $status = $xz->write($hello);
+                    ok $status, "  wrote ok" ;
+                    ok $xz->close(), "  closed ok";
 
-                is myXzReadFile($name), $hello, "  got expected content";
+                    my ($s, $data) = myXzReadFile($name);
+                    skip "Not enough memory to read with $UncompressClass", 1
+                        if  memError($s);
+                    is $data, $hello, "  got expected content";
+                }
             }
         }
     }

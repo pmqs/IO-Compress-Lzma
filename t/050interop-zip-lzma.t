@@ -53,7 +53,8 @@ sub readWithP7Zip
 {
     my $file = shift ;
 
-    my $lex = new LexFile my $outfile, my $stderr;
+    my ($outfile, $stderr) ;
+    my $lex = new LexFile $outfile, $stderr;
 
     my $comp = "$P7ZIP" ;
 

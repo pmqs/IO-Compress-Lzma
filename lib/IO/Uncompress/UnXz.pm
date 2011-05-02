@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.033 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.034 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.033 ;
+use IO::Uncompress::Base 2.034 ;
 use IO::Uncompress::Adapter::UnXz 2.020 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnXzError);
 
-$VERSION = '2.033';
+$VERSION = '2.034';
 $UnXzError = '';
 
 @ISA    = qw( Exporter IO::Uncompress::Base );
@@ -40,7 +40,7 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common 2.033 qw(:Parse);
+    use IO::Compress::Base::Common 2.034 qw(:Parse);
     
     return (
         'MemLimit'   => [1, 1, Parse_unsigned,   128 * 1024 * 1024],
@@ -798,7 +798,7 @@ If the C<$z> object is associated with a file or a filehandle, C<fileno>
 will return the underlying file descriptor. Once the C<close> method is
 called C<fileno> will return C<undef>.
 
-If the C<$z> object is is associated with a buffer, this method will return
+If the C<$z> object is associated with a buffer, this method will return
 C<undef>.
 
 =head2 close

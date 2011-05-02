@@ -119,8 +119,7 @@ BEGIN
 {
     title "Test interop with $LZMA" ;
 
-    my $file = 'a.lzma';
-    my $file1 = 'b.lzma';
+    my ($file, $file1);
     my $lex = new LexFile $file, $file1;
     my $content = "hello world\n" ;
     my $got;

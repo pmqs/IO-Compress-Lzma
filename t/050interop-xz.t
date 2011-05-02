@@ -116,8 +116,7 @@ BEGIN
 {
     title "Test interop with $XZ" ;
 
-    my $file = 'a.xz';
-    my $file1 = 'b.xz';
+    my ($file, $file1);
     my $lex = new LexFile $file, $file1;
     my $content = "hello world\n" ;
     my $got;

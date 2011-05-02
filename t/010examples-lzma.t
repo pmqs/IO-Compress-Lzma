@@ -65,12 +65,8 @@ EOM
 
 my @hello2 = grep(s/$/\n/, split(/\n/, $hello2)) ;
 
-my $file1 = "hello1.gz" ;
-my $file2 = "hello2.gz" ;
-my $stderr = "err.out" ;
-
-for ($file1, $file2, $stderr) { 1 while unlink $_ } ;
-
+my ($file1, $file2, $stderr) ;
+my $lex = new LexFile $file1, $file2, $stderr ;
 
 lzma \$hello1 => $file1 ;
 lzma \$hello2 => $file2 ;
@@ -80,9 +76,8 @@ sub check
     my $command = shift ;
     my $expected = shift ;
 
-    my $stderr = 'err.out';
-    1 while unlink $stderr;
-
+    my $lex = new LexFile my $stderr ;
+    
     my $cmd = "$command 2>$stderr";
     my $stdout = `$cmd` ;
 
@@ -136,9 +131,3 @@ for ($file1, $file2, $stderr) { 1 while unlink $_ } ;
     title "lzcat" ;
     check "$Perl ${examples}/lzcat $file2", $hello1 ;
 }
-
-END
-{
-    for ($file1, $file2, $stderr) { 1 while unlink $_ } ;
-}
-

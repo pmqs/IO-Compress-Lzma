@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.035 qw(:Status);
+use IO::Compress::Base::Common  2.036 qw(:Status);
 
-use Compress::Raw::Lzma  2.035 qw(LZMA_OK LZMA_STREAM_END) ;
+use Compress::Raw::Lzma  2.036 qw(LZMA_OK LZMA_STREAM_END) ;
 
 our ($VERSION);
-$VERSION = '2.035';
+$VERSION = '2.036';
 
 sub mkCompObject
 {
@@ -20,6 +20,37 @@ sub mkCompObject
                                            Filter => $Filter);
 
     return (undef, "Could not create AloneEncoder object: $status", $status)
+        if $status != LZMA_OK ;
+
+    return bless {'Def'        => $def,
+                  'Error'      => '',
+                  'ErrorNo'    => 0,
+                 }  ;     
+}
+
+sub mkRawZipCompObject
+{
+    my $preset = shift ;
+    my $extreme = shift;
+    my $filter;
+
+
+    if (defined $preset) {
+        $preset |= Compress::Raw::Lzma::LZMA_PRESET_EXTREME()
+            if $extreme;
+        $filter = Lzma::Filter::Lzma1::Preset($preset) ;
+    }
+    else  
+      { $filter = Lzma::Filter::Lzma1 }
+
+    my ($def, $status) =
+    Compress::Raw::Lzma::RawEncoder->new(AppendOutput => 1,
+                                         ForZip => 1,
+                                         Filter => $filter,
+                                         #Filter => Lzma::Filter::Lzma1m
+                                         );
+
+    return (undef, "Could not create RawEncoder object: $status", $status)
         if $status != LZMA_OK ;
 
     return bless {'Def'        => $def,

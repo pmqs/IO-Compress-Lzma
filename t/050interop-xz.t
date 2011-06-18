@@ -106,7 +106,7 @@ BEGIN
     $extra = 1
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
-    plan tests => 7 + $extra ;
+    plan tests => 12 + $extra ;
 
     use_ok('IO::Compress::Xz',     ':all') ;
     use_ok('IO::Uncompress::UnXz', ':all') ;
@@ -119,6 +119,26 @@ BEGIN
     my ($file, $file1);
     my $lex = new LexFile $file, $file1;
     my $content = "hello world\n" ;
+    my $got;
+
+    ok writeWithXz($file, $content), "writeWithXz ok";
+
+    unxz $file => \$got ;
+    is $got, $content;
+
+
+    xz \$content => $file1;
+    $got = '';
+    ok readWithXz($file1, $got), "readWithXz returns 0";
+    is $got, $content, "got content";
+}
+
+{
+    title "Test interop with $XZ - empty file" ;
+
+    my ($file, $file1);
+    my $lex = new LexFile $file, $file1;
+    my $content = "" ;
     my $got;
 
     ok writeWithXz($file, $content), "writeWithXz ok";

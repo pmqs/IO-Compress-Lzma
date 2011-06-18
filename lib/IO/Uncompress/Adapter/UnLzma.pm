@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.035 qw(:Status);
+use IO::Compress::Base::Common 2.036 qw(:Status);
 
-use Compress::Raw::Lzma 2.035 ;
+use Compress::Raw::Lzma 2.036 ;
 
 our ($VERSION, @ISA);
-$VERSION = '2.035';
+$VERSION = '2.036';
 
 #@ISA = qw( Compress::Raw::UnLzma );
 
@@ -26,6 +26,33 @@ sub mkUncompObject
                                               LimitOutput => 1);
 
     return (undef, "Could not create AloneDecoder object: $status", $status)
+        if $status != LZMA_OK ;
+
+    return bless {'Inf'           => $inflate,
+                  'CompSize'      => 0,
+                  'UnCompSize'    => 0,
+                  'Error'         => '',
+                  'ConsumesInput' => 1,
+                  #'CompressedLen' => $CompressedLength || 0,
+                  #'UncompressedLen' => $UncompressedLength || 0,
+                 }  ;     
+    
+}
+
+sub mkUncompZipObject
+{
+    my $properties = shift ;
+    #my $CompressedLength = shift;
+    #my $UncompressedLength = shift;
+    #my $small     = shift || 0;
+    #my $verbosity = shift || 0;
+
+    my ($inflate, $status) = Compress::Raw::Lzma::RawDecoder->new(AppendOutput => 1,
+                                              Properties => $properties,
+                                              ConsumeInput => 1, 
+                                              LimitOutput => 1);
+
+    return (undef, "Could not create RawDecoder object: $status", $status)
         if $status != LZMA_OK ;
 
     return bless {'Inf'           => $inflate,
@@ -81,7 +108,7 @@ sub uncompr
         return STATUS_ERROR;
     }
     
-    return STATUS_ENDSTREAM if $status == LZMA_STREAM_END ;
+    return STATUS_ENDSTREAM if $status == LZMA_STREAM_END  || $eof ;
     #return STATUS_ENDSTREAM if $status == LZMA_STREAM_END  ||
     #                           ( $cLen && $status == LZMA_OK &&
     #                             $inf->compressedBytes() >= $cLen);

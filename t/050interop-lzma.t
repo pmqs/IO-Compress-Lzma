@@ -109,7 +109,7 @@ BEGIN
     $extra = 1
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
-    plan tests => 7 + $extra ;
+    plan tests => 12 + $extra ;
 
     use_ok('IO::Compress::Lzma',     ':all') ;
     use_ok('IO::Uncompress::UnLzma', ':all') ;
@@ -122,6 +122,26 @@ BEGIN
     my ($file, $file1);
     my $lex = new LexFile $file, $file1;
     my $content = "hello world\n" ;
+    my $got;
+
+    ok writeWithLzma($file, $content), "writeWithLzma ok";
+
+    unlzma $file => \$got ;
+    is $got, $content;
+
+
+    lzma \$content => $file1;
+    $got = '';
+    ok readWithLzma($file1, $got), "readWithLzma returns 0";
+    is $got, $content, "got content";
+}
+
+{
+    title "Test interop with $LZMA - empty file" ;
+
+    my ($file, $file1);
+    my $lex = new LexFile $file, $file1;
+    my $content = "" ;
     my $got;
 
     ok writeWithLzma($file, $content), "writeWithLzma ok";

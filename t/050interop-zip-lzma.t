@@ -12,8 +12,8 @@ use Test::More ;
 use CompTestUtils;
 
 BEGIN {
-    plan(skip_all => "temp disabled until IO::Compress::RawLzma is ready")
-        if 1;
+    #plan(skip_all => "temp disabled until IO::Compress::RawLzma is ready")
+    #    if 1;
 
     plan(skip_all => "needs Perl 5.6 or better - you have Perl $]" )
         if $] < 5.006 ;    
@@ -21,7 +21,7 @@ BEGIN {
 use bytes;
 use warnings;
 
-my $P7ZIP ;
+my $P7ZIP ='7z';
 
 
 sub ExternalP7ZipWorks
@@ -104,7 +104,7 @@ sub testWithP7Zip
 BEGIN {
 
     # Check external 7za exists
-    my $p7zip = '7za';
+    my $p7zip = '7z';
     for my $dir (reverse split ":", $ENV{PATH})
     {
         $P7ZIP = "$dir/$p7zip"
@@ -124,7 +124,7 @@ BEGIN {
     $extra = 1
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
-    plan tests => 63 + $extra ;
+    plan tests => 575 + $extra ;
 
     use_ok('IO::Compress::Zip',     ':all') ;
     use_ok('IO::Uncompress::Unzip', ':all') ;
@@ -135,50 +135,72 @@ BEGIN {
 {
     title "Test interop with $P7ZIP" ;
 
-    my $file;
+    my $file ;
     my $file1;
     my $file2;
     my $lex = new LexFile $file, $file1, $file2;
-    my $content = qq {
+
+    my @content = ("", qq {
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
  dolor. Camelus perlus.  Larrius in lumen numen.  Dolor en quiquum filia
  est.  Quintus cenum parat.
-};
+
+ Hello World
+});
     my $got;
 
-    for my $method (qw(Copy Deflate Bzip2 LZMA))
+    #for my $method (qw(Copy Deflate Bzip2 LZMA))
+    for my $content (@content)
     {
-        title "unzip with Method $method";
-        ok writeWithP7Zip($file, $content, "-mm=$method"), "  writeWithP7Zip ok";
-
-        $got = '';
-        ok readWithP7Zip($file, $got), "  readWithP7Zip ok";
-        is $got, $content, "  got content";
-
-        $got = '';
-        unzip $file => \$got ;
-        is $got, $content, "  got content with unzip";
-    }
-
-
-    for my $method (ZIP_CM_STORE, ZIP_CM_DEFLATE, ZIP_CM_BZIP2, ZIP_CM_LZMA)
-    {
-        for my $streamed (1, 0)
+        for my $method (qw(LZMA))
         {
-            title "zip with Method $method, Streamed $streamed";
-            zip \$content => $file1, Name => "fred", Stream => $streamed,
-                                        Method => $method ;
+            title "unzip with Method $method";
+            ok writeWithP7Zip($file, $content, "-mm=$method"), "  writeWithP7Zip ok";
 
             $got = '';
-            unzip $file1 => \$got ;
-            is $got, $content, "  got content with unzip";
-
-            $got = '';
-            ok readWithP7Zip($file1, $got), "  readWithP7Zip ok";
+            ok readWithP7Zip($file, $got), "  readWithP7Zip ok";
             is $got, $content, "  got content";
 
-            ok testWithP7Zip($file1, $got), "  testWithP7Zip ok"
-             or diag "  got $got";
+            $got = '';
+            ok unzip($file => \$got), "  unzipped ok" ;
+            is $got, $content, "  got content with unzip";
+        }
+    }
+
+    for my $content (@content)
+    {
+        #for my $method (ZIP_CM_STORE, ZIP_CM_DEFLATE, ZIP_CM_BZIP2, ZIP_CM_LZMA)
+        for my $method (ZIP_CM_LZMA)
+        {
+            for my $streamed (1, 0)
+            {
+                for my $preset (0 .. 9)
+                {
+                    for my $extreme (0, 1)
+                    {
+                        title "zip with Method $method, Streamed $streamed, Preset $preset, Extreme $extreme";
+                        ok zip(\$content => $file1, Name => "fred", 
+                                                    Preset => $preset,
+                                                    Extreme => $extreme,
+                                                    Stream => $streamed,
+                                                    Method => $method), 
+                                                "zip ok" 
+                           or diag $ZipError;
+
+                        $got = '';
+                        ok unzip($file1 => \$got), "unzipped"
+                            or diag $UnzipError ;
+                        is $got, $content, "  got content with unzip";
+
+                        $got = '';
+                        ok readWithP7Zip($file1, $got), "  readWithP7Zip ok";
+                        is $got, $content, "  got content";
+
+                        ok testWithP7Zip($file1, $got), "  testWithP7Zip ok"
+                         or diag "  got $got";
+                    }
+                }
+            }
         }
     }
 }

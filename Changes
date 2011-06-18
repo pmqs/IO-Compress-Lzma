@@ -1,6 +1,16 @@
 CHANGES
 -------
 
+  2.036 18 June 2011
+
+      * IO::Compress::Adapter
+        Added interface to allow creation of LZMA stream for use in a 
+        zip file
+
+      * IO::Unxompress::Adapter
+        Added interface to allow reading of LZMA stream in a 
+        zip file
+
   2.035 6 May 2011
 
       * RT #67931: Test failure on Windows

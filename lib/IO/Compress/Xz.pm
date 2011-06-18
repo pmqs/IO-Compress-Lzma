@@ -5,15 +5,15 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.035 ;
-use IO::Compress::Base::Common  2.035 qw(createSelfTiedObject);
+use IO::Compress::Base 2.036 ;
+use IO::Compress::Base::Common  2.036 qw(createSelfTiedObject);
 use IO::Compress::Adapter::Xz 2.020 ;
-use Compress::Raw::Lzma  2.035 ;
+use Compress::Raw::Lzma  2.036 ;
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $XzError);
 
-$VERSION = '2.035';
+$VERSION = '2.036';
 $XzError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -53,8 +53,8 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common  2.035 qw(:Parse);
-    use Compress::Raw::Lzma 2.035 qw(LZMA_PRESET_DEFAULT LZMA_CHECK_CRC32) ;
+    use IO::Compress::Base::Common  2.036 qw(:Parse);
+    use Compress::Raw::Lzma 2.036 qw(LZMA_PRESET_DEFAULT LZMA_CHECK_CRC32) ;
     
     return (
         'Preset'        => [1, 1, Parse_unsigned, LZMA_PRESET_DEFAULT],
@@ -541,7 +541,7 @@ compression.
 9 is the slowest compession with the highest memory usage but with the best
 compression.
 
-Defaults to C<LZMA_PRESET_DEFAULT>.
+Defaults to C<LZMA_PRESET_DEFAULT> (6).
 
 =item C<< Extreme => 0|1 >>
 

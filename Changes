@@ -1,6 +1,11 @@
 CHANGES
 -------
 
+  2.037 20 June 2011
+
+      * Handle "Cannot Allocate Memory" issue with Extreme test in 
+        t/105oneshot-zip-lzma-only.t
+
   2.036 18 June 2011
 
       * IO::Compress::Adapter

@@ -101,6 +101,16 @@ sub testWithP7Zip
     return $status ;
 }
 
+
+sub memError
+{
+    my $err = shift ;
+    #my $re = "(" . LZMA_MEM_ERROR . "|" . LZMA_MEMLIMIT_ERROR . ")";
+    #my $re .= LZMA_MEM_ERROR;
+    my $re = "(Memory usage limit was reached|Cannot allocate memory)";
+    return $err =~/$re/ ;
+}
+
 BEGIN {
 
     # Check external 7za exists
@@ -179,12 +189,17 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
                     for my $extreme (0, 1)
                     {
                         title "zip with Method $method, Streamed $streamed, Preset $preset, Extreme $extreme";
-                        ok zip(\$content => $file1, Name => "fred", 
+                        my $status = zip(\$content => $file1, 
+                                                    Name => "fred", 
                                                     Preset => $preset,
                                                     Extreme => $extreme,
                                                     Stream => $streamed,
-                                                    Method => $method), 
-                                                "zip ok" 
+                                                    Method => $method);
+
+                       skip "Not enough memory - Preset $preset, Extreme $extreme, Preset $preset", 6
+                            if  memError($ZipError);
+
+                        ok $status, "zip ok"
                            or diag $ZipError;
 
                         $got = '';

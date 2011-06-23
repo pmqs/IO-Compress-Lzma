@@ -9,7 +9,7 @@ use IO::Compress::Base::Common 2.037 qw(:Status);
 use Compress::Raw::Lzma 2.037 ;
 
 our ($VERSION, @ISA);
-$VERSION = '2.037';
+$VERSION = '2.038';
 
 #@ISA = qw( Compress::Raw::UnLzma );
 

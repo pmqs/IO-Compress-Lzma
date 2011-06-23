@@ -14,7 +14,7 @@ use IO::Compress::Adapter::Lzma 2.006 ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.037';
+$VERSION = '2.038';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);

@@ -12,7 +12,7 @@ use IO::Uncompress::Adapter::UnLzma 2.006 ;
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzmaError);
 
-$VERSION = '2.037';
+$VERSION = '2.038';
 $UnLzmaError = '';
 
 @ISA    = qw( Exporter IO::Uncompress::Base );

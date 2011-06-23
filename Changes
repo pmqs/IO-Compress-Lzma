@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+  2.038 23 June 2011
+
+      * Fixed missing SKIP label in t/050interop-zip-lzma.t
+
   2.037 20 June 2011
 
       * Handle "Cannot Allocate Memory" issue with Extreme test in 

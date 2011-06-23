@@ -188,6 +188,8 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
                 {
                     for my $extreme (0, 1)
                     {
+                      SKIP:
+                      {
                         title "zip with Method $method, Streamed $streamed, Preset $preset, Extreme $extreme";
                         my $status = zip(\$content => $file1, 
                                                     Name => "fred", 
@@ -197,7 +199,7 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
                                                     Method => $method);
 
                        skip "Not enough memory - Preset $preset, Extreme $extreme, Preset $preset", 6
-                            if  memError($ZipError);
+                            if memError($ZipError);
 
                         ok $status, "zip ok"
                            or diag $ZipError;
@@ -213,6 +215,7 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
 
                         ok testWithP7Zip($file1, $got), "  testWithP7Zip ok"
                          or diag "  got $got";
+                      }
                     }
                 }
             }

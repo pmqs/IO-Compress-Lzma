@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               IO-Compress-Lzma
-version:            2.037
+version:            2.038
 abstract:           Write lzma files/buffers
 author:
     - Paul Marquess <pmqs@cpan.org>

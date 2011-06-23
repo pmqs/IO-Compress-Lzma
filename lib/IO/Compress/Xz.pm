@@ -13,7 +13,7 @@ use Compress::Raw::Lzma  2.037 ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $XzError);
 
-$VERSION = '2.037';
+$VERSION = '2.038';
 $XzError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);

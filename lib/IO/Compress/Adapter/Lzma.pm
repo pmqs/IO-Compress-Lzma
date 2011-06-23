@@ -9,7 +9,7 @@ use IO::Compress::Base::Common  2.037 qw(:Status);
 use Compress::Raw::Lzma  2.037 qw(LZMA_OK LZMA_STREAM_END) ;
 
 our ($VERSION);
-$VERSION = '2.037';
+$VERSION = '2.038';
 
 sub mkCompObject
 {

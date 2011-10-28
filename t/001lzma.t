@@ -149,18 +149,21 @@ if(0)
 hello world
 this is a test
 EOM
+    $hello = $hello x 1000 ;
 
     {
         title "$CompressClass";
-        my $lex = new LexFile my $name ;
+        #my $lex = new LexFile my $name ;
+        my $name = "/tmp/lz.lz";
         my $bz ;
         $bz = new IO::Compress::Lzma($name)
             or diag $IO::Compress::Lzma::LzmaError ;
-        ok $bz, "  bz object ok";
+        ok $bz, "  lzma object ok";
         $bz->write($hello);
         $bz->close($hello);
 
-        is myLzmaReadFile($name), $hello, "  got expected content";
+        #is myLzmaReadFile($name), $hello, "  got expected content";
+        ok myLzmaReadFile($name) eq $hello, "  got expected content";
     }
 
     # TODO - add filter tests

@@ -8,6 +8,7 @@ BEGIN {
 use lib qw(t t/compress);
 use strict;
 
+use File::Spec ;
 use Test::More ;
 use CompTestUtils;
 

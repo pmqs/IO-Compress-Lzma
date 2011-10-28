@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  2.039 28 October 2011
+
+      * IO::Unompress::UnLzma
+        - Fixed uncompression issue
+          RT #71114
+
   2.038 23 June 2011
 
       * Fixed missing SKIP label in t/050interop-zip-lzma.t

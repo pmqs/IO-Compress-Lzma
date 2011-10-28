@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.037 qw(:Status);
+use IO::Compress::Base::Common 2.039 qw(:Status);
 
-use Compress::Raw::Lzma 2.037 ;
+use Compress::Raw::Lzma 2.039 ;
 
 our ($VERSION, @ISA);
-$VERSION = '2.038';
+$VERSION = '2.039';
 
 #@ISA = qw( Compress::Raw::UnLzma );
 
@@ -74,33 +74,8 @@ sub uncompr
     my $eof  = shift ;
 
     my $inf   = $self->{Inf};
-    my $uncLen = $self->{UncompressedLen};
-    my $cLen = $self->{CompressedLen};
-
-#    if (0 && $cLen)
-#    {
-#        my $delta = $cLen - $inf->uncompressedBytes() ;
-#
-#        $from = substr($$from, 0, $delta)
-#            if length $$from > $delta ;
-#    }
-
     my $status = $inf->code($from, $to);
     $self->{ErrorNo} = $status;
-
-#    warn "Status $status(" . ($status+0) . ")  EOF $eof CL $cLen, UL $uncLen ".  
-#            $inf->uncompressedBytes() . 
-#            " " . length($$from) . " " . length($$to) . "\n";
-#    #if ($eof && $status != LZMA_STREAM_END )
-#    if ($eof &&
-#        ($cLen == 0 ? $status != LZMA_STREAM_END 
-#                    : $inf->compressedBytes() < $cLen)
-#                   #: $inf->uncompressedBytes() < $uncLen)
-#       )
-#    {
-#        $self->{Error} = "unexpected end of file";
-#        return STATUS_ERROR;
-#    }
 
     if ($status != LZMA_OK && $status != LZMA_STREAM_END )
     {
@@ -108,10 +83,9 @@ sub uncompr
         return STATUS_ERROR;
     }
     
-    return STATUS_ENDSTREAM if $status == LZMA_STREAM_END  || $eof ;
-    #return STATUS_ENDSTREAM if $status == LZMA_STREAM_END  ||
-    #                           ( $cLen && $status == LZMA_OK &&
-    #                             $inf->compressedBytes() >= $cLen);
+    return STATUS_ENDSTREAM if $status == LZMA_STREAM_END  || 
+                                ($eof && length $$from == 0);
+
     return STATUS_OK        if $status == LZMA_OK ;
     return STATUS_ERROR ;
 }

@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.037 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.039 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.037 ;
+use IO::Uncompress::Base 2.039 ;
 use IO::Uncompress::Adapter::UnXz 2.020 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnXzError);
 
-$VERSION = '2.038';
+$VERSION = '2.039';
 $UnXzError = '';
 
 @ISA    = qw( Exporter IO::Uncompress::Base );
@@ -40,7 +40,7 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common 2.037 qw(:Parse);
+    use IO::Compress::Base::Common 2.039 qw(:Parse);
     
     return (
         'MemLimit'   => [1, 1, Parse_unsigned,   128 * 1024 * 1024],

@@ -10,6 +10,7 @@ use strict;
 use warnings;
 use bytes;
 
+use File::Spec ;
 use Test::More ;
 use CompTestUtils;
 
@@ -88,12 +89,16 @@ BEGIN
 
     for my $dir (reverse split $split, $ENV{PATH})    
     {
-        $LZMA = "$dir/$nameLZ"
-            if -x "$dir/$nameLZ" ;
+        $LZMA = File::Spec->catfile($dir,$nameLZ)
+            if -x File::Spec->catfile($dir,$nameLZ);
 
-        $UNLZMA = "$dir/$nameUNLZ"
-            if -x "$dir/$nameUNLZ" ;
+        $UNLZMA = File::Spec->catfile($dir,$nameUNLZ)
+            if -x File::Spec->catfile($dir,$nameUNLZ);
     }
+
+    # Handle spaces in path to lzma 
+    $LZMA = "\"$LZMA\"" if $LZMA =~ /\s/;    
+    $UNLZMA = "\"$UNLZMA\"" if $UNLZMA =~ /\s/;    
 
     plan(skip_all => "Cannot find $nameLZ")
         if ! $LZMA ;

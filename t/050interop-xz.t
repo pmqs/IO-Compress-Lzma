@@ -10,6 +10,7 @@ use strict;
 use warnings;
 use bytes;
 
+use File::Spec ;
 use Test::More ;
 use CompTestUtils;
 
@@ -91,9 +92,12 @@ BEGIN
 
     for my $dir (reverse split $split, $ENV{PATH})    
     {
-        $XZ = "$dir/$name"
-            if -x "$dir/$name" ;
+        $XZ = File::Spec->catfile($dir,$name)
+            if -x File::Spec->catfile($dir,$name);
     }
+
+    # Handle spaces in path to xz 
+    $XZ = "\"$XZ\"" if $XZ =~ /\s/;    
 
     plan(skip_all => "Cannot find $name")
         if ! $XZ ;

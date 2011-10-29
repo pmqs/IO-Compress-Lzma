@@ -97,7 +97,7 @@ BEGIN
     }
 
     # Handle spaces in path to xz 
-    $XZ = "\"$XZ\"" if $XZ =~ /\s/;    
+    $XZ = "\"$XZ\"" if defined $XZ && $XZ =~ /\s/;    
 
     plan(skip_all => "Cannot find $name")
         if ! $XZ ;

@@ -97,8 +97,8 @@ BEGIN
     }
 
     # Handle spaces in path to lzma 
-    $LZMA = "\"$LZMA\"" if $LZMA =~ /\s/;    
-    $UNLZMA = "\"$UNLZMA\"" if $UNLZMA =~ /\s/;    
+    $LZMA = "\"$LZMA\"" if defined $LZMA && $LZMA =~ /\s/;    
+    $UNLZMA = "\"$UNLZMA\"" if defined $UNLZMA && $UNLZMA =~ /\s/;    
 
     plan(skip_all => "Cannot find $nameLZ")
         if ! $LZMA ;

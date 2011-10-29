@@ -153,8 +153,7 @@ EOM
 
     {
         title "$CompressClass";
-        #my $lex = new LexFile my $name ;
-        my $name = "/tmp/lz.lz";
+        my $lex = new LexFile my $name ;
         my $bz ;
         $bz = new IO::Compress::Lzma($name)
             or diag $IO::Compress::Lzma::LzmaError ;

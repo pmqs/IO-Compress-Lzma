@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  2.041 29 October 2011
+
+      * t/001lzma.t
+        - Remove debugging line that writes to /tmp
+          RT #72023
+
   2.040 28 October 2011
 
       * No Changes

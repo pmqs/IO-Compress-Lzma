@@ -66,4 +66,5 @@ examples/lzstream   perl
 examples/xzcat  perl
 examples/xzgrep perl
 examples/xzstream   perl
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,4 +1,5 @@
 README
+lib/IO/Compress/Lzma/FAQ.pod
 lib/IO/Uncompress/UnLzma.pm
 lib/IO/Uncompress/UnXz.pm
 lib/IO/Compress/Lzma.pm
@@ -59,7 +60,6 @@ t/compress/CompTestUtils.pm
 MANIFEST
 private/MakeUtil.pm
 Changes
-pod/FAQ.pod
 examples/lzcat  perl
 examples/lzgrep perl
 examples/lzstream   perl

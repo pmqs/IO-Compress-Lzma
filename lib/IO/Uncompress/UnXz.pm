@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.043 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.044 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.043 ;
-use IO::Uncompress::Adapter::UnXz 2.043 ;
+use IO::Uncompress::Base 2.044 ;
+use IO::Uncompress::Adapter::UnXz 2.044 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnXzError);
 
-$VERSION = '2.043';
+$VERSION = '2.044';
 $UnXzError = '';
 
 @ISA    = qw( Exporter IO::Uncompress::Base );
@@ -40,7 +40,7 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common 2.043 qw(:Parse);
+    use IO::Compress::Base::Common 2.044 qw(:Parse);
     
     return (
         'MemLimit'   => [1, 1, Parse_unsigned,   128 * 1024 * 1024],
@@ -889,7 +889,7 @@ Same as doing this
 
 L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
 
-L<Compress::Zlib::FAQ|Compress::Zlib::FAQ>
+L<IO::Compress::FAQ|IO::Compress::FAQ>
 
 L<File::GlobMapper|File::GlobMapper>, L<Archive::Zip|Archive::Zip>,
 L<Archive::Tar|Archive::Tar>,

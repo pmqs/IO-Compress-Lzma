@@ -1,5 +1,4 @@
 README
-lib/IO/Compress/Lzma/FAQ.pod
 lib/IO/Uncompress/UnLzma.pm
 lib/IO/Uncompress/UnXz.pm
 lib/IO/Compress/Lzma.pm

@@ -32,12 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Compress::Raw::Lzma" : "2.044",
-            "IO::Compress::Base" : "2.044",
-            "IO::Uncompress::Base" : "2.044"
+            "Compress::Raw::Lzma" : "2.045",
+            "IO::Compress::Base" : "2.045",
+            "IO::Uncompress::Base" : "2.045"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "2.044"
+   "version" : "2.045"
 }

@@ -5,15 +5,15 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.045 ;
-use IO::Compress::Base::Common  2.045 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Xz 2.045 ;
-use Compress::Raw::Lzma  2.045 ;
+use IO::Compress::Base 2.047 ;
+use IO::Compress::Base::Common  2.047 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Xz 2.047 ;
+use Compress::Raw::Lzma  2.047 ;
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $XzError);
 
-$VERSION = '2.045';
+$VERSION = '2.047';
 $XzError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -53,8 +53,8 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common  2.045 qw(:Parse);
-    use Compress::Raw::Lzma 2.045 qw(LZMA_PRESET_DEFAULT LZMA_CHECK_CRC32) ;
+    use IO::Compress::Base::Common  2.047 qw(:Parse);
+    use Compress::Raw::Lzma 2.047 qw(LZMA_PRESET_DEFAULT LZMA_CHECK_CRC32) ;
     
     return (
         'Preset'        => [1, 1, Parse_unsigned, LZMA_PRESET_DEFAULT],
@@ -789,7 +789,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2011 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2012 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

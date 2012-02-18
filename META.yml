@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Compress::Raw::Lzma: 2.048
-  IO::Compress::Base: 2.048
-  IO::Uncompress::Base: 2.048
-version: 2.048
+  Compress::Raw::Lzma: 2.049
+  IO::Compress::Base: 2.049
+  IO::Uncompress::Base: 2.049
+version: 2.049

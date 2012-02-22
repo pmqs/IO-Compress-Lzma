@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.050 ;
+use IO::Compress::Base 2.051 ;
 
-use IO::Compress::Base::Common  2.050 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.050 ;
+use IO::Compress::Base::Common  2.051 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.051 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.050';
+$VERSION = '2.051';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -51,7 +51,7 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common  2.050 qw(:Parse);
+    use IO::Compress::Base::Common  2.051 qw(:Parse);
     
     return (
         'Filter'     => [0, 1, Parse_any,   [] ],

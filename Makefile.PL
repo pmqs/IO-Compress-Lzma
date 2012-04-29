@@ -3,7 +3,7 @@
 use strict ;
 require 5.006 ;
 
-$::VERSION = '2.051' ;
+$::VERSION = '2.052' ;
 
 use private::MakeUtil;
 use ExtUtils::MakeMaker 5.16 ;
@@ -38,6 +38,12 @@ WriteMakefile(
             AUTHOR       => 'Paul Marquess <pmqs@cpan.org>')
         : ()
     ),
+
+    META_MERGE => {
+        no_index => {
+            directory => [ 't', 'private' ],
+        },
+    },    
 
     ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
         ('LICENSE'  => 'perl')         : ()),    

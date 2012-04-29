@@ -16,7 +16,9 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "t",
+         "private"
       ]
    },
    "prereqs" : {
@@ -32,12 +34,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Compress::Raw::Lzma" : "2.051",
-            "IO::Compress::Base" : "2.051",
-            "IO::Uncompress::Base" : "2.051"
+            "Compress::Raw::Lzma" : "2.052",
+            "IO::Compress::Base" : "2.052",
+            "IO::Uncompress::Base" : "2.052"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "2.051"
+   "version" : "2.052"
 }

@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.051 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.052 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.051 ;
-use IO::Uncompress::Adapter::UnXz 2.051 ;
+use IO::Uncompress::Base 2.052 ;
+use IO::Uncompress::Adapter::UnXz 2.052 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnXzError);
 
-$VERSION = '2.051';
+$VERSION = '2.052';
 $UnXzError = '';
 
 @ISA    = qw( Exporter IO::Uncompress::Base );
@@ -40,7 +40,7 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common 2.051 qw(:Parse);
+    use IO::Compress::Base::Common 2.052 qw(:Parse);
     
     return (
         'MemLimit'   => [1, 1, Parse_unsigned,   128 * 1024 * 1024],
@@ -524,7 +524,7 @@ The string '-' can be used as an alias for standard input.
 =item A scalar reference 
 
 If C<$input> is a scalar reference, the compressed data will be read from
-C<$$output>.
+C<$$input>.
 
 =back
 

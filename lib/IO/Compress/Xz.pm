@@ -5,15 +5,15 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.052 ;
-use IO::Compress::Base::Common  2.052 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Xz 2.052 ;
-use Compress::Raw::Lzma  2.052 ;
+use IO::Compress::Base 2.055 ;
+use IO::Compress::Base::Common  2.055 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Xz 2.055 ;
+use Compress::Raw::Lzma  2.055 ;
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $XzError);
 
-$VERSION = '2.052';
+$VERSION = '2.055';
 $XzError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -53,8 +53,8 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common  2.052 qw(:Parse);
-    use Compress::Raw::Lzma 2.052 qw(LZMA_PRESET_DEFAULT LZMA_CHECK_CRC32) ;
+    use IO::Compress::Base::Common  2.055 qw(:Parse);
+    use Compress::Raw::Lzma 2.055 qw(LZMA_PRESET_DEFAULT LZMA_CHECK_CRC32) ;
     
     return (
         'Preset'        => [1, 1, Parse_unsigned, LZMA_PRESET_DEFAULT],

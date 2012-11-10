@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.055 ;
+use IO::Compress::Base 2.057 ;
 
-use IO::Compress::Base::Common  2.055 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.055 ;
+use IO::Compress::Base::Common  2.057 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.057 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.055';
+$VERSION = '2.057';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -47,15 +47,11 @@ sub mkHeader
 
 }
 
+our %PARAMS = ('filter' => [IO::Compress::Base::Common::Parse_any, [] ],
+              );
 sub getExtraParams
 {
-    my $self = shift ;
-
-    use IO::Compress::Base::Common  2.055 qw(:Parse);
-    
-    return (
-        'Filter'     => [0, 1, Parse_any,   [] ],
-        );
+    return %PARAMS ;
 }
 
 
@@ -77,7 +73,7 @@ sub mkComp
     my $got = shift ;
 
     my ($obj, $errstr, $errno) =
-        IO::Compress::Adapter::Lzma::mkCompObject($got->value('Filter'));
+        IO::Compress::Adapter::Lzma::mkCompObject($got->getValue('filter'));
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;

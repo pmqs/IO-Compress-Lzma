@@ -5,15 +5,15 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.055 ;
-use IO::Compress::Base::Common  2.055 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Xz 2.055 ;
-use Compress::Raw::Lzma  2.055 ;
+use IO::Compress::Base 2.057 ;
+use IO::Compress::Base::Common  2.057 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Xz 2.057 ;
+use Compress::Raw::Lzma  2.057 ;
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $XzError);
 
-$VERSION = '2.055';
+$VERSION = '2.057';
 $XzError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -48,19 +48,15 @@ sub mkHeader
     return '';
 
 }
+our %PARAMS = (
+        'preset' => [IO::Compress::Base::Common::Parse_unsigned, LZMA_PRESET_DEFAULT],
+        'extreme'=> [IO::Compress::Base::Common::Parse_boolean, 0],
+        'check'  => [IO::Compress::Base::Common::Parse_unsigned, LZMA_CHECK_CRC32],
+    );
 
 sub getExtraParams
 {
-    my $self = shift ;
-
-    use IO::Compress::Base::Common  2.055 qw(:Parse);
-    use Compress::Raw::Lzma 2.055 qw(LZMA_PRESET_DEFAULT LZMA_CHECK_CRC32) ;
-    
-    return (
-        'Preset'        => [1, 1, Parse_unsigned, LZMA_PRESET_DEFAULT],
-        'Extreme'       => [1, 1, Parse_boolean, 0],
-        'Check'         => [1, 1, Parse_unsigned, LZMA_CHECK_CRC32],
-        );
+    return %PARAMS ;
 }
 
 
@@ -82,9 +78,9 @@ sub mkComp
     my $got = shift ;
 
     my ($obj, $errstr, $errno) 
-        = IO::Compress::Adapter::Xz::mkCompObject($got->value('Preset'),
-                                                  $got->value('Extreme'),
-                                                  $got->value('Check')
+        = IO::Compress::Adapter::Xz::mkCompObject($got->getValue('preset'),
+                                                  $got->getValue('extreme'),
+                                                  $got->getValue('check')
                                                  );
 
     return $self->saveErrorString(undef, $errstr, $errno)

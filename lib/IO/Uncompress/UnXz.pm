@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.055 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.057 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.055 ;
-use IO::Uncompress::Adapter::UnXz 2.055 ;
+use IO::Uncompress::Base 2.057 ;
+use IO::Uncompress::Adapter::UnXz 2.057 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnXzError);
 
-$VERSION = '2.055';
+$VERSION = '2.057';
 $UnXzError = '';
 
 @ISA    = qw( Exporter IO::Uncompress::Base );
@@ -36,16 +36,14 @@ sub unxz
     return $obj->_inf(@_);
 }
 
+our %PARAMS = (
+        'memLimit' => [IO::Compress::Base::Common::Parse_unsigned, 128 * 1024 * 1024],
+        'flags'    => [IO::Compress::Base::Common::Parse_boolean,  0],
+    );    
+
 sub getExtraParams
 {
-    my $self = shift ;
-
-    use IO::Compress::Base::Common 2.055 qw(:Parse);
-    
-    return (
-        'MemLimit'   => [1, 1, Parse_unsigned,   128 * 1024 * 1024],
-        'Flags'      => [1, 1, Parse_boolean,   0],
-        );
+    return %PARAMS ;
 }
 
 
@@ -68,8 +66,8 @@ sub mkUncomp
     *$self->{Info} = $self->readHeader($magic)
         or return undef ;
 
-    my $memlimit = $got->value('MemLimit');
-    my $flags    = $got->value('Flags');
+    my $memlimit = $got->getValue('memlimit');
+    my $flags    = $got->getValue('flags');
 
     my ($obj, $errstr, $errno) =  IO::Uncompress::Adapter::UnXz::mkUncompObject(
                                                     $memlimit, $flags);
@@ -740,6 +738,13 @@ Returns true if the end of the compressed input stream has been reached.
 Provides a sub-set of the C<seek> functionality, with the restriction
 that it is only legal to seek forward in the input file/buffer.
 It is a fatal error to attempt to seek backward.
+
+Note that the implementation of C<seek> in this module does not provide
+true random access to a compressed file/buffer. It  works by uncompressing
+data from the current offset in the file/buffer until it reaches the
+ucompressed offset specified in the parameters to C<seek>. For very small
+files this may be acceptable behaviour. For large files it may cause an
+unacceptable delay.
 
 The C<$whence> parameter takes one the usual values, namely SEEK_SET,
 SEEK_CUR or SEEK_END.

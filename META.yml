@@ -20,7 +20,7 @@ no_index:
     - t
     - private
 requires:
-  Compress::Raw::Lzma: 2.057
-  IO::Compress::Base: 2.057
-  IO::Uncompress::Base: 2.057
-version: 2.057
+  Compress::Raw::Lzma: 2.058
+  IO::Compress::Base: 2.058
+  IO::Uncompress::Base: 2.058
+version: 2.058

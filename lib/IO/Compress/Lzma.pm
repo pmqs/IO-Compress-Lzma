@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.057 ;
+use IO::Compress::Base 2.058 ;
 
-use IO::Compress::Base::Common  2.057 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.057 ;
+use IO::Compress::Base::Common  2.058 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.058 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.057';
+$VERSION = '2.058';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);

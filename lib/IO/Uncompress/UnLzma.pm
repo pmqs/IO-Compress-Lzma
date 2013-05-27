@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.060 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.061 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.060 ;
-use IO::Uncompress::Adapter::UnLzma 2.060 ;
+use IO::Uncompress::Base 2.061 ;
+use IO::Uncompress::Adapter::UnLzma 2.061 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzmaError);
 
-$VERSION = '2.060';
+$VERSION = '2.061';
 $UnLzmaError = '';
 
 @ISA    = qw( Exporter IO::Uncompress::Base );
@@ -282,7 +282,7 @@ section.
 
 The functional interface needs Perl5.005 or better.
 
-=head2 unlzma $input => $output [, OPTS]
+=head2 unlzma $input_filename_or_reference => $output_filename_or_reference [, OPTS]
 
 C<unlzma> expects at least two parameters,
 C<$input_filename_or_reference> and C<$output_filename_or_reference>.

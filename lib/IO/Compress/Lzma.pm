@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.060 ;
+use IO::Compress::Base 2.061 ;
 
-use IO::Compress::Base::Common  2.060 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.060 ;
+use IO::Compress::Base::Common  2.061 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.061 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.060';
+$VERSION = '2.061';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -199,7 +199,7 @@ section.
 
 The functional interface needs Perl5.005 or better.
 
-=head2 lzma $input => $output [, OPTS]
+=head2 lzma $input_filename_or_reference => $output_filename_or_reference [, OPTS]
 
 C<lzma> expects at least two parameters,
 C<$input_filename_or_reference> and C<$output_filename_or_reference>.

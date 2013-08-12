@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.061 ;
+use IO::Compress::Base 2.062 ;
 
-use IO::Compress::Base::Common  2.061 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.061 ;
+use IO::Compress::Base::Common  2.062 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.062 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.061';
+$VERSION = '2.062';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -721,7 +721,7 @@ Usage is
 
 Closes the current compressed data stream and starts a new one.
 
-OPTS consists of any of the the options that are available when creating
+OPTS consists of any of the options that are available when creating
 the C<$z> object.
 
 See the L</"Constructor Options"> section for more details.

@@ -19,7 +19,7 @@ BEGIN {
     plan(skip_all => "needs Perl 5.6 or better - you have Perl $]" )
         if $] < 5.006 ;    
 }
-use bytes;
+# use bytes;
 use warnings;
 
 my $P7ZIP ='7z';

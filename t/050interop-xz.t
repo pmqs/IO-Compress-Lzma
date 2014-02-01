@@ -8,7 +8,7 @@ BEGIN {
 use lib qw(t t/compress);
 use strict;
 use warnings;
-use bytes;
+# use bytes;
 
 use File::Spec ;
 use Test::More ;

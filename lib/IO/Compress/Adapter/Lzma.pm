@@ -4,12 +4,12 @@ use strict;
 use warnings;
 # use bytes;
 
-use IO::Compress::Base::Common  2.065 qw(:Status);
+use IO::Compress::Base::Common  2.066 qw(:Status);
 
-use Compress::Raw::Lzma  2.065 qw(LZMA_OK LZMA_STREAM_END) ;
+use Compress::Raw::Lzma  2.066 qw(LZMA_OK LZMA_STREAM_END) ;
 
 use vars qw($VERSION);
-$VERSION = '2.065';
+$VERSION = '2.066';
 
 sub mkCompObject
 {

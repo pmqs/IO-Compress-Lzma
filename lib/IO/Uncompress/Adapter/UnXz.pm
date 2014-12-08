@@ -4,12 +4,12 @@ use strict;
 use warnings;
 # use bytes;
 
-use IO::Compress::Base::Common 2.066 qw(:Status);
+use IO::Compress::Base::Common 2.067 qw(:Status);
 
-use Compress::Raw::Lzma 2.066 ;
+use Compress::Raw::Lzma 2.067 ;
 
 use vars qw($VERSION @ISA);
-$VERSION = '2.066';
+$VERSION = '2.067';
 
 #@ISA = qw( Compress::Raw::UnLzma );
 

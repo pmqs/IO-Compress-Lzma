@@ -5,16 +5,16 @@ use warnings;
 # use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.068 ;
+use IO::Compress::Base 2.069 ;
 
-use IO::Compress::Base::Common  2.068 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.068 ;
+use IO::Compress::Base::Common  2.069 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.069 ;
 
 
 
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS $LzmaError);
 
-$VERSION = '2.068';
+$VERSION = '2.069';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -765,7 +765,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2014 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2015 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

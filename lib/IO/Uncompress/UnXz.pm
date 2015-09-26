@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 # use bytes;
 
-use IO::Compress::Base::Common 2.068 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.069 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.068 ;
-use IO::Uncompress::Adapter::UnXz 2.068 ;
+use IO::Uncompress::Base 2.069 ;
+use IO::Uncompress::Adapter::UnXz 2.069 ;
 
 require Exporter ;
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS $UnXzError);
 
-$VERSION = '2.068';
+$VERSION = '2.069';
 $UnXzError = '';
 
 @ISA    = qw( Exporter IO::Uncompress::Base );
@@ -918,7 +918,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2014 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2015 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

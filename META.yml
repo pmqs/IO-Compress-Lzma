@@ -3,15 +3,15 @@ abstract: 'Write lzma files/buffers'
 author:
   - 'Paul Marquess <pmqs@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IO-Compress-Lzma
 no_index:
   directory:
@@ -20,7 +20,8 @@ no_index:
     - t
     - private
 requires:
-  Compress::Raw::Lzma: 2.069
-  IO::Compress::Base: 2.069
-  IO::Uncompress::Base: 2.069
-version: 2.069
+  Compress::Raw::Lzma: '2.070'
+  IO::Compress::Base: '2.070'
+  IO::Uncompress::Base: '2.070'
+version: '2.070'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

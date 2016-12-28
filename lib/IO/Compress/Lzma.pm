@@ -5,16 +5,16 @@ use warnings;
 # use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.069 ;
+use IO::Compress::Base 2.070 ;
 
-use IO::Compress::Base::Common  2.069 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.069 ;
+use IO::Compress::Base::Common  2.070 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.070 ;
 
 
 
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS $LzmaError);
 
-$VERSION = '2.069';
+$VERSION = '2.070';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);
@@ -757,7 +757,7 @@ L<IO::Zlib|IO::Zlib>
 
 =head1 AUTHOR
 
-This module was written by Paul Marquess, F<pmqs@cpan.org>. 
+This module was written by Paul Marquess, C<pmqs@cpan.org>. 
 
 =head1 MODIFICATION HISTORY
 
@@ -765,7 +765,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2015 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2016 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

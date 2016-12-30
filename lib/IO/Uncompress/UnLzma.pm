@@ -2,17 +2,17 @@ package IO::Uncompress::UnLzma ;
 
 use strict ;
 use warnings;
-# use bytes;
+use bytes;
 
-use IO::Compress::Base::Common 2.070 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.071 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.070 ;
-use IO::Uncompress::Adapter::UnLzma 2.070 ;
+use IO::Uncompress::Base 2.071 ;
+use IO::Uncompress::Adapter::UnLzma 2.071 ;
 
 require Exporter ;
-use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS $UnLzmaError);
+our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzmaError);
 
-$VERSION = '2.070';
+$VERSION = '2.071';
 $UnLzmaError = '';
 
 @ISA    = qw( Exporter IO::Uncompress::Base );

@@ -2,19 +2,19 @@ package IO::Compress::Lzma ;
 
 use strict ;
 use warnings;
-# use bytes;
+use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.070 ;
+use IO::Compress::Base 2.071 ;
 
-use IO::Compress::Base::Common  2.070 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.070 ;
+use IO::Compress::Base::Common  2.071 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.071 ;
 
 
 
-use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS $LzmaError);
+our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.070';
+$VERSION = '2.071';
 $LzmaError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);

@@ -2,14 +2,14 @@ package IO::Uncompress::Adapter::UnXz;
 
 use strict;
 use warnings;
-# use bytes;
+use bytes;
 
-use IO::Compress::Base::Common 2.070 qw(:Status);
+use IO::Compress::Base::Common 2.071 qw(:Status);
 
-use Compress::Raw::Lzma 2.070 ;
+use Compress::Raw::Lzma 2.071 ;
 
-use vars qw($VERSION @ISA);
-$VERSION = '2.070';
+our ($VERSION, @ISA);
+$VERSION = '2.071';
 
 #@ISA = qw( Compress::Raw::UnLzma );
 

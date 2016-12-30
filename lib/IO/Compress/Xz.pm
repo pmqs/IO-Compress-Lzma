@@ -2,18 +2,18 @@ package IO::Compress::Xz ;
 
 use strict ;
 use warnings;
-# use bytes;
+use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.070 ;
-use IO::Compress::Base::Common  2.070 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Xz 2.070 ;
-use Compress::Raw::Lzma  2.070 ;
+use IO::Compress::Base 2.071 ;
+use IO::Compress::Base::Common  2.071 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Xz 2.071 ;
+use Compress::Raw::Lzma  2.071 ;
 
 
-use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS $XzError);
+our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $XzError);
 
-$VERSION = '2.070';
+$VERSION = '2.071';
 $XzError = '';
 
 @ISA    = qw(Exporter IO::Compress::Base);

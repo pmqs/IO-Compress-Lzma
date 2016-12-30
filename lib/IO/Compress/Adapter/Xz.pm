@@ -2,14 +2,14 @@ package IO::Compress::Adapter::Xz ;
 
 use strict;
 use warnings;
-# use bytes;
+use bytes;
 
-use IO::Compress::Base::Common  2.070 qw(:Status);
+use IO::Compress::Base::Common  2.071 qw(:Status);
 
-use Compress::Raw::Lzma  2.070 qw(LZMA_OK LZMA_STREAM_END LZMA_PRESET_DEFAULT LZMA_CHECK_CRC32) ;
+use Compress::Raw::Lzma  2.071 qw(LZMA_OK LZMA_STREAM_END LZMA_PRESET_DEFAULT LZMA_CHECK_CRC32) ;
 
-use vars qw($VERSION);
-$VERSION = '2.070';
+our ($VERSION);
+$VERSION = '2.071';
 
 sub mkCompObject
 {

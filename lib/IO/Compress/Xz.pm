@@ -5,15 +5,15 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.081 ;
-use IO::Compress::Base::Common  2.081 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Xz 2.081 ;
-use Compress::Raw::Lzma  2.081 ;
+use IO::Compress::Base 2.082 ;
+use IO::Compress::Base::Common  2.082 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Xz 2.082 ;
+use Compress::Raw::Lzma  2.082 ;
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $XzError);
 
-$VERSION = '2.081';
+$VERSION = '2.082';
 $XzError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -336,9 +336,7 @@ This parameter defaults to 0.
 
 =item C<< BinModeIn => 0|1 >>
 
-When reading from a file or filehandle, set C<binmode> before reading.
-
-Defaults to 0.
+This option is now a no-op. All files will be read in binmode.
 
 =item C<< Append => 0|1 >>
 

@@ -20,8 +20,8 @@ no_index:
     - t
     - private
 requires:
-  Compress::Raw::Lzma: '2.082'
-  IO::Compress::Base: '2.082'
-  IO::Uncompress::Base: '2.082'
-version: '2.082'
+  Compress::Raw::Lzma: '2.083'
+  IO::Compress::Base: '2.083'
+  IO::Uncompress::Base: '2.083'
+version: '2.083'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

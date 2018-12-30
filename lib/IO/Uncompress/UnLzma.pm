@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.082 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.083 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.082 ;
-use IO::Uncompress::Adapter::UnLzma 2.082 ;
+use IO::Uncompress::Base 2.083 ;
+use IO::Uncompress::Adapter::UnLzma 2.083 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzmaError);
 
-$VERSION = '2.082';
+$VERSION = '2.083';
 $UnLzmaError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );

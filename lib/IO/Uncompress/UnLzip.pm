@@ -1,4 +1,4 @@
-package IO::Uncompress::UnXz ;
+package IO::Uncompress::UnLzip ;
 
 use strict ;
 use warnings;
@@ -7,16 +7,16 @@ use bytes;
 use IO::Compress::Base::Common 2.084 qw(:Status createSelfTiedObject);
 
 use IO::Uncompress::Base 2.084 ;
-use IO::Uncompress::Adapter::UnXz 2.084 ;
+use IO::Uncompress::Adapter::UnLzip 2.084 ;
 
 require Exporter ;
-our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnXzError);
+our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzipError);
 
 $VERSION = '2.084';
-$UnXzError = '';
+$UnLzipError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
-@EXPORT_OK = qw( $UnXzError unxz ) ;
+@EXPORT_OK = qw( $UnLzipError unlzip ) ;
 #%EXPORT_TAGS = %IO::Uncompress::Base::EXPORT_TAGS ;
 push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
 #Exporter::export_ok_tags('all');
@@ -25,25 +25,25 @@ push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
 sub new
 {
     my $class = shift ;
-    my $obj = createSelfTiedObject($class, \$UnXzError);
+    my $obj = createSelfTiedObject($class, \$UnLzipError);
 
     $obj->_create(undef, 0, @_);
 }
 
-sub unxz
+sub unlzip
 {
-    my $obj = createSelfTiedObject(undef, \$UnXzError);
+    my $obj = createSelfTiedObject(undef, \$UnLzipError);
     return $obj->_inf(@_);
 }
 
-our %PARAMS = (
-        'memlimit' => [IO::Compress::Base::Common::Parse_unsigned, 128 * 1024 * 1024],
-        'flags'    => [IO::Compress::Base::Common::Parse_boolean,  0],
-    );    
+#our %PARAMS = (
+        #'verbosity' => [IO::Compress::Base::Common::Parse_boolean,   0],
+        #'small'     => [IO::Compress::Base::Common::Parse_boolean,   0],
+#    );
 
 sub getExtraParams
 {
-    return %PARAMS ;
+    return ();
 }
 
 
@@ -66,11 +66,11 @@ sub mkUncomp
     *$self->{Info} = $self->readHeader($magic)
         or return undef ;
 
-    my $memlimit = $got->getValue('memlimit');
-    my $flags    = $got->getValue('flags');
+    my $Small     = $got->getValue('small');
+    my $Verbosity = $got->getValue('verbosity');
 
-    my ($obj, $errstr, $errno) =  IO::Uncompress::Adapter::UnXz::mkUncompObject(
-                                                    $memlimit, $flags);
+    my ($obj, $errstr, $errno) =  IO::Uncompress::Adapter::UnLzip::mkUncompObject(
+                                                    *$self->{Info}{DictSize});
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
@@ -78,65 +78,114 @@ sub mkUncomp
     *$self->{Uncomp} = $obj;
 
     return 1;
-
 }
 
-
-use constant XZ_ID_SIZE => 6;
-use constant XZ_MAGIC   => "\0xFD". '7zXZ'. "\0x00" ;
 
 sub ckMagic
 {
     my $self = shift;
 
     my $magic ;
-    $self->smartReadExact(\$magic, XZ_ID_SIZE);
+    $self->smartReadExact(\$magic, 4);
 
     *$self->{HeaderPending} = $magic ;
-    
-    return $self->HeaderError("Header size is " . 
-                                        XZ_ID_SIZE . " bytes") 
-        if length $magic != XZ_ID_SIZE;
 
-    return $self->HeaderError("Bad Magic.")
-        if ! isXzMagic($magic) ;
-                      
-        
-    *$self->{Type} = 'xz';
-    return $magic;
+    return $self->HeaderError("Minimum header size is " . 
+                              4 . " bytes") 
+        if length $magic != 4 ;                                    
+
+    return $self->HeaderError("Bad Magic")
+        if $magic ne 'LZIP' ;
+
+    *$self->{Type} = 'lzip';
+
+    return $magic ;
 }
+
+
 
 sub readHeader
 {
     my $self = shift;
     my $magic = shift ;
+    my ($buffer) = '' ;
 
-    $self->pushBack($magic);
-    *$self->{HeaderPending} = '';
+    $self->smartReadExact(\$buffer, 2)
+        or return $self->HeaderError("Minimum header size is " . 
+                                     2 . " bytes") ;
 
+    my $keep = $magic . $buffer ;
+    *$self->{HeaderPending} = $keep ;
+
+    my ($VN, $DS) = unpack("C C", $buffer) ;
+
+    # Version should be 0 or 1
+    return $self->HeaderError("lzip version not 0 or 1: $VN")
+	    unless $VN == 0 or $VN == 1 ;
+
+    # Dictionary logic derived from libarchive archive_read_support_filter_xz.c
+	my $log2dic = $DS & 0x1f;
+
+    return $self->HeaderError("Bad Dictionary Value")
+	    if $log2dic < 12 || $log2dic > 27 ;
+
+
+	my $dicsize = 1 << $log2dic;
+
+    $dicsize -= ($dicsize / 16) * ($DS >> 5)
+	    if $log2dic > 12 ;
 
     return {
-        'Type'              => 'xz',
-        'FingerprintLength' => XZ_ID_SIZE,
-        'HeaderLength'      => XZ_ID_SIZE,
-        'TrailerLength'     => 0,
-        'Header'            => '$magic'
-        };
-    
+        'Type'              => 'lzip',
+        'Version'           => $VN,
+        'FingerprintLength' => 4,
+        'HeaderLength'      => 6,
+        'TrailerLength'     => $VN ? 20 : 12,
+        'Header'            => $keep,
+        'Version'           => $VN,
+        'DictSize'          => $dicsize, 
+        };    
 }
 
 sub chkTrailer
 {
+    my $self = shift;
+    my $trailer = shift;
+
+    my $not_version_0 = *$self->{Info}{Version} != 0;
+    # Check CRC & ISIZE 
+    my $CRC32 = unpack("V", $trailer) ;
+    my $uSize = U64::newUnpack_V64 substr($trailer,  4, 8);
+    my $mSize;
+    if ($not_version_0)
+    {
+        $mSize = U64::newUnpack_V64 substr($trailer, 12, 8);
+        *$self->{Info}{CompressedLength} = $mSize->get64bit();
+
+    }
+
+    *$self->{Info}{CRC32} = $CRC32;    
+    *$self->{Info}{UncompressedLength} = $uSize->get64bit(); 
+    
+    if (*$self->{Strict}) {
+        return $self->TrailerError("CRC mismatch")
+            if $CRC32 != *$self->{Uncomp}->crc32() ;
+
+        return $self->TrailerError("USIZE mismatch.")        
+            if ! $uSize->equal(*$self->{UnCompSize});   
+
+        if ($not_version_0)
+        {
+            $mSize->subtract(6 + 20); # header & trailer
+
+            return $self->TrailerError("CSIZE mismatch.")
+                if ! $mSize->equal(*$self->{CompSize}); 
+        }                    
+    }
+
     return STATUS_OK;
 }
 
-
-
-sub isXzMagic
-{
-    my $buffer = shift ;
-    return $buffer =~ /^\xFD\x37\x7A\x58\x5A\x00/;
-}
 
 1 ;
 
@@ -145,17 +194,17 @@ __END__
 
 =head1 NAME
 
-IO::Uncompress::UnXz - Read xz files/buffers
+IO::Uncompress::UnLzip - Read lzip files/buffers
 
 =head1 SYNOPSIS
 
-    use IO::Uncompress::UnXz qw(unxz $UnXzError) ;
+    use IO::Uncompress::UnLzip qw(unlzip $UnLzipError) ;
 
-    my $status = unxz $input => $output [,OPTS]
-        or die "unxz failed: $UnXzError\n";
+    my $status = unlzip $input => $output [,OPTS]
+        or die "unlzip failed: $UnLzipError\n";
 
-    my $z = new IO::Uncompress::UnXz $input [OPTS]
-        or die "unxz failed: $UnXzError\n";
+    my $z = new IO::Uncompress::UnLzip $input [OPTS]
+        or die "unlzip failed: $UnLzipError\n";
 
     $status = $z->read($buffer)
     $status = $z->read($buffer, $length)
@@ -175,7 +224,7 @@ IO::Uncompress::UnXz - Read xz files/buffers
     $z->eof()
     $z->close()
 
-    $UnXzError ;
+    $UnLzipError ;
 
     # IO::File mode
 
@@ -192,42 +241,28 @@ IO::Uncompress::UnXz - Read xz files/buffers
 
 =head1 DESCRIPTION
 
-B<WARNING -- This is a Beta release>.
-
-=over 5
-
-=item * DO NOT use in production code.
-
-=item * The documentation is incomplete in places.
-
-=item * Parts of the interface defined here are tentative.
-
-=item * Please report any problems you find.
-
-=back
-
 This module provides a Perl interface that allows the reading of
 lzma files/buffers.
 
-For writing xz files/buffers, see the companion module IO::Compress::Xz.
+For writing lzip files/buffers, see the companion module IO::Compress::Lzip.
 
 =head1 Functional Interface
 
-A top-level function, C<unxz>, is provided to carry out
+A top-level function, C<unlzip>, is provided to carry out
 "one-shot" uncompression between buffers and/or files. For finer
 control over the uncompression process, see the L</"OO Interface">
 section.
 
-    use IO::Uncompress::UnXz qw(unxz $UnXzError) ;
+    use IO::Uncompress::UnLzip qw(unlzip $UnLzipError) ;
 
-    unxz $input_filename_or_reference => $output_filename_or_reference [,OPTS]
-        or die "unxz failed: $UnXzError\n";
+    unlzip $input_filename_or_reference => $output_filename_or_reference [,OPTS]
+        or die "unlzip failed: $UnLzipError\n";
 
 The functional interface needs Perl5.005 or better.
 
-=head2 unxz $input_filename_or_reference => $output_filename_or_reference [, OPTS]
+=head2 unlzip $input_filename_or_reference => $output_filename_or_reference [, OPTS]
 
-C<unxz> expects at least two parameters,
+C<unlzip> expects at least two parameters,
 C<$input_filename_or_reference> and C<$output_filename_or_reference>.
 
 =head3 The C<$input_filename_or_reference> parameter
@@ -269,7 +304,7 @@ contains valid filenames before any data is uncompressed.
 =item An Input FileGlob string
 
 If C<$input_filename_or_reference> is a string that is delimited by the
-characters "<" and ">" C<unxz> will assume that it is an
+characters "<" and ">" C<unlzip> will assume that it is an
 I<input fileglob string>. The input is the list of files that match the
 fileglob.
 
@@ -313,7 +348,7 @@ the uncompressed data will be pushed onto the array.
 =item An Output FileGlob
 
 If C<$output_filename_or_reference> is a string that is delimited by the
-characters "<" and ">" C<unxz> will assume that it is an
+characters "<" and ">" C<unlzip> will assume that it is an
 I<output fileglob string>. The output is the list of files that match the
 fileglob.
 
@@ -338,7 +373,7 @@ files/buffers.
 
 =head2 Optional Parameters
 
-Unless specified below, the optional parameters for C<unxz>,
+Unless specified below, the optional parameters for C<unlzip>,
 C<OPTS>, are the same as those used with the OO interface defined in the
 L</"Constructor Options"> section below.
 
@@ -347,10 +382,10 @@ L</"Constructor Options"> section below.
 =item C<< AutoClose => 0|1 >>
 
 This option applies to any input or output data streams to
-C<unxz> that are filehandles.
+C<unlzip> that are filehandles.
 
 If C<AutoClose> is specified, and the value is true, it will result in all
-input and/or output filehandles being closed once C<unxz> has
+input and/or output filehandles being closed once C<unlzip> has
 completed.
 
 This parameter defaults to 0.
@@ -443,64 +478,64 @@ uncompressed data to the file C<file1.txt>.
 
     use strict ;
     use warnings ;
-    use IO::Uncompress::UnXz qw(unxz $UnXzError) ;
+    use IO::Uncompress::UnLzip qw(unlzip $UnLzipError) ;
 
     my $input = "file1.txt.xz";
     my $output = "file1.txt";
-    unxz $input => $output
-        or die "unxz failed: $UnXzError\n";
+    unlzip $input => $output
+        or die "unlzip failed: $UnLzipError\n";
 
 To read from an existing Perl filehandle, C<$input>, and write the
 uncompressed data to a buffer, C<$buffer>.
 
     use strict ;
     use warnings ;
-    use IO::Uncompress::UnXz qw(unxz $UnXzError) ;
+    use IO::Uncompress::UnLzip qw(unlzip $UnLzipError) ;
     use IO::File ;
 
     my $input = new IO::File "<file1.txt.xz"
         or die "Cannot open 'file1.txt.xz': $!\n" ;
     my $buffer ;
-    unxz $input => \$buffer
-        or die "unxz failed: $UnXzError\n";
+    unlzip $input => \$buffer
+        or die "unlzip failed: $UnLzipError\n";
 
 To uncompress all files in the directory "/my/home" that match "*.txt.xz" and store the compressed data in the same directory
 
     use strict ;
     use warnings ;
-    use IO::Uncompress::UnXz qw(unxz $UnXzError) ;
+    use IO::Uncompress::UnLzip qw(unlzip $UnLzipError) ;
 
-    unxz '</my/home/*.txt.xz>' => '</my/home/#1.txt>'
-        or die "unxz failed: $UnXzError\n";
+    unlzip '</my/home/*.txt.xz>' => '</my/home/#1.txt>'
+        or die "unlzip failed: $UnLzipError\n";
 
 and if you want to compress each file one at a time, this will do the trick
 
     use strict ;
     use warnings ;
-    use IO::Uncompress::UnXz qw(unxz $UnXzError) ;
+    use IO::Uncompress::UnLzip qw(unlzip $UnLzipError) ;
 
     for my $input ( glob "/my/home/*.txt.xz" )
     {
         my $output = $input;
         $output =~ s/.xz// ;
-        unxz $input => $output
-            or die "Error compressing '$input': $UnXzError\n";
+        unlzip $input => $output
+            or die "Error compressing '$input': $UnLzipError\n";
     }
 
 =head1 OO Interface
 
 =head2 Constructor
 
-The format of the constructor for IO::Uncompress::UnXz is shown below
+The format of the constructor for IO::Uncompress::UnLzip is shown below
 
-    my $z = new IO::Uncompress::UnXz $input [OPTS]
-        or die "IO::Uncompress::UnXz failed: $UnXzError\n";
+    my $z = new IO::Uncompress::UnLzip $input [OPTS]
+        or die "IO::Uncompress::UnLzip failed: $UnLzipError\n";
 
-Returns an C<IO::Uncompress::UnXz> object on success and undef on failure.
-The variable C<$UnXzError> will contain an error message on failure.
+Returns an C<IO::Uncompress::UnLzip> object on success and undef on failure.
+The variable C<$UnLzipError> will contain an error message on failure.
 
 If you are running Perl 5.005 or better the object, C<$z>, returned from
-IO::Uncompress::UnXz can be used exactly like an L<IO::File|IO::File> filehandle.
+IO::Uncompress::UnLzip can be used exactly like an L<IO::File|IO::File> filehandle.
 This means that all normal input file operations can be carried out with
 C<$z>.  For example, to read a line from a compressed file/buffer you can
 use either of these forms
@@ -549,7 +584,7 @@ OPTS is a combination of the following options:
 
 This option is only valid when the C<$input> parameter is a filehandle. If
 specified, and the value is true, it will result in the file being closed once
-either the C<close> method is called or the IO::Uncompress::UnXz object is
+either the C<close> method is called or the IO::Uncompress::UnLzip object is
 destroyed.
 
 This parameter defaults to 0.
@@ -588,7 +623,7 @@ This option defaults to 1.
 
 =item C<< BlockSize => $num >>
 
-When reading the compressed input data, IO::Uncompress::UnXz will read it in
+When reading the compressed input data, IO::Uncompress::UnLzip will read it in
 blocks of C<$num> bytes.
 
 This option defaults to 4096.
@@ -626,14 +661,6 @@ carrying out the decompression. When Strict is on, the extra tests are
 carried out, when Strict is off they are not.
 
 The default for this option is off.
-
-=item C<< MemLimit => $number >>
-
-Default is 128Meg.
-
-=item C<< Flags => $flags >>
-
-Default is 0.
 
 =back
 
@@ -819,7 +846,7 @@ C<undef>.
 Closes the output file/buffer.
 
 For most versions of Perl this method will be automatically invoked if
-the IO::Uncompress::UnXz object is destroyed (either explicitly or by the
+the IO::Uncompress::UnLzip object is destroyed (either explicitly or by the
 variable with the reference to the object going out of scope). The
 exceptions are Perl versions 5.005 through 5.00504 and 5.8.0. In
 these cases, the C<close> method will be called automatically, but
@@ -832,7 +859,7 @@ closing.
 
 Returns true on success, otherwise 0.
 
-If the C<AutoClose> option has been enabled when the IO::Uncompress::UnXz
+If the C<AutoClose> option has been enabled when the IO::Uncompress::UnLzip
 object was created, and the object is associated with a file, the
 underlying file will also be closed.
 
@@ -880,16 +907,16 @@ C<InputLength> option in the constructor.
 
 =head1 Importing
 
-No symbolic constants are required by this IO::Uncompress::UnXz at present.
+No symbolic constants are required by this IO::Uncompress::UnLzip at present.
 
 =over 5
 
 =item :all
 
-Imports C<unxz> and C<$UnXzError>.
+Imports C<unlzip> and C<$UnLzipError>.
 Same as doing this
 
-    use IO::Uncompress::UnXz qw(unxz $UnXzError) ;
+    use IO::Uncompress::UnLzip qw(unlzip $UnLzipError) ;
 
 =back
 
@@ -897,7 +924,7 @@ Same as doing this
 
 =head1 SEE ALSO
 
-L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Compress::Lzip>, L<IO::Uncompress::UnLzip>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Compress::Zstd>, L<IO::Uncompress::UnZstd>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
+L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzip>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Compress::Zstd>, L<IO::Uncompress::UnZstd>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
 
 L<IO::Compress::FAQ|IO::Compress::FAQ>
 

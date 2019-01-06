@@ -1,4 +1,4 @@
-package IO::Compress::Xz ;
+package IO::Compress::Lzip ;
 
 use strict ;
 use warnings;
@@ -6,38 +6,34 @@ use bytes;
 require Exporter ;
 
 use IO::Compress::Base 2.084 ;
+
 use IO::Compress::Base::Common  2.084 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Xz 2.084 ;
-use Compress::Raw::Lzma  2.084 ;
+use IO::Compress::Adapter::Lzip 2.084 ;
 
-
-our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $XzError);
+our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzipError);
 
 $VERSION = '2.084';
-$XzError = '';
+$LzipError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
-@EXPORT_OK = qw( $XzError xz ) ;
+@EXPORT_OK = qw( $LzipError lzip ) ;
 %EXPORT_TAGS = %IO::Compress::Base::EXPORT_TAGS ;
-
-push @{ $EXPORT_TAGS{constants} }, @Compress::Raw::Lzma::EXPORT;
-$EXPORT_TAGS{all} = $EXPORT_TAGS{constants} ;
-
 push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
 Exporter::export_ok_tags('all');
+
 
 
 sub new
 {
     my $class = shift ;
 
-    my $obj = createSelfTiedObject($class, \$XzError);
+    my $obj = createSelfTiedObject($class, \$LzipError);
     return $obj->_create(undef, @_);
 }
 
-sub xz
+sub lzip
 {
-    my $obj = createSelfTiedObject(undef, \$XzError);
+    my $obj = createSelfTiedObject(undef, \$LzipError);
     $obj->_def(@_);
 }
 
@@ -45,43 +41,68 @@ sub xz
 sub mkHeader 
 {
     my $self = shift ;
-    return '';
+    my $opts = shift ;
 
+    my $header = "LZIP\x01" ;
+
+    # Code below to calculate dictionary size derived from libarchive archive_write_add_filter_xz.c
+
+    # Hard-wire size for now
+    # my $dict_size  = 1 << 12 ;
+    my $dict_size = $opts->getValue('dictsize');
+
+    my ($ds, $log2dic, $wedges);
+
+    $self->saveErrorString(undef, "Unacceptable dictionary size for lzip: $dict_size")
+        if $dict_size < (1 << 12) || $dict_size > (1 << 27) ;
+
+    for ($log2dic = 27; $log2dic >= 12; $log2dic--) 
+    {
+        last
+            if $dict_size & (1 << $log2dic) ;
+    }
+
+    if ($dict_size > (1 << $log2dic)) 
+    {
+        ++ $log2dic ;
+        $wedges =  ((1 << $log2dic) - $dict_size) / (1 << ($log2dic - 4));
+    } 
+    else
+    {
+        $wedges = 0;
+    }
+
+    $ds = (($wedges << 5) & 0xe0) | ($log2dic & 0x1f);
+
+    $header .= pack ("C", $ds) ;
+
+    return $header;
 }
-our %PARAMS = (
-        'preset' => [IO::Compress::Base::Common::Parse_unsigned, LZMA_PRESET_DEFAULT],
-        'extreme'=> [IO::Compress::Base::Common::Parse_boolean, 0],
-        'check'  => [IO::Compress::Base::Common::Parse_unsigned, LZMA_CHECK_CRC32],
-    );
 
+our %PARAMS = ('dictsize' => [IO::Compress::Base::Common::Parse_unsigned, 1 << 23 ], # 8 Meg
+              );
 sub getExtraParams
 {
     return %PARAMS ;
 }
-
-
 
 sub ckParams
 {
     my $self = shift ;
     my $got = shift;
 
-    # TODO - validate the parameters
-    
     return 1 ;
 }
-
 
 sub mkComp
 {
     my $self = shift ;
     my $got = shift ;
 
-    my ($obj, $errstr, $errno) 
-        = IO::Compress::Adapter::Xz::mkCompObject($got->getValue('preset'),
-                                                  $got->getValue('extreme'),
-                                                  $got->getValue('check')
-                                                 );
+    my $DictSize     = $got->getValue('dictsize');
+
+    my ($obj, $errstr, $errno) =
+        IO::Compress::Adapter::Lzip::mkCompObject($DictSize);
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
@@ -89,12 +110,18 @@ sub mkComp
     return $obj;
 }
 
-
 sub mkTrailer
 {
     my $self = shift ;
-    return '';
+
+    *$self->{CompSize}->add( 6 + 20);   # Compressed size + header + trailer
+
+    return pack("V", *$self->{Compress}->crc32() ) .
+         *$self->{UnCompSize}->getPacked_V64() . # Uncompressed size                       
+                       
+         *$self->{CompSize}->getPacked_V64() ;   # Compressed size
 }
+
 
 sub mkFinalTrailer
 {
@@ -109,7 +136,7 @@ sub mkFinalTrailer
 
 sub getInverseClass
 {
-    return ('IO::Uncompress::UnXz');
+    return ('IO::Uncompress::UnLzip');
 }
 
 sub getFileInfo
@@ -126,17 +153,17 @@ __END__
 
 =head1 NAME
 
-IO::Compress::Xz - Write xz files/buffers
+IO::Compress::Lzip - Write lzip files/buffers
 
 =head1 SYNOPSIS
 
-    use IO::Compress::Xz qw(xz $XzError) ;
+    use IO::Compress::Lzip qw(lzip $LzipError) ;
 
-    my $status = xz $input => $output [,OPTS]
-        or die "xz failed: $XzError\n";
+    my $status = lzip $input => $output [,OPTS]
+        or die "lzip failed: $LzipError\n";
 
-    my $z = new IO::Compress::Xz $output [,OPTS]
-        or die "xz failed: $XzError\n";
+    my $z = new IO::Compress::Lzip $output [,OPTS]
+        or die "lzip failed: $LzipError\n";
 
     $z->print($string);
     $z->printf($format, $string);
@@ -155,7 +182,7 @@ IO::Compress::Xz - Write xz files/buffers
 
     $z->close() ;
 
-    $XzError ;
+    $LzipError ;
 
     # IO::File mode
 
@@ -171,43 +198,29 @@ IO::Compress::Xz - Write xz files/buffers
 
 =head1 DESCRIPTION
 
-B<WARNING -- This is a Beta release>.
-
-=over 5
-
-=item * DO NOT use in production code.
-
-=item * The documentation is incomplete in places.
-
-=item * Parts of the interface defined here are tentative.
-
-=item * Please report any problems you find.
-
-=back
-
-This module provides a Perl interface that allows writing xz
+This module provides a Perl interface that allows writing lzip
 compressed data to files or buffer.
 
-For reading xz files/buffers, see the companion module
-L<IO::Uncompress::UnXz|IO::Uncompress::UnXz>.
+For reading lzip files/buffers, see the companion module
+L<IO::Uncompress::UnLzip|IO::Uncompress::UnLzip>.
 
 =head1 Functional Interface
 
-A top-level function, C<xz>, is provided to carry out
+A top-level function, C<lzip>, is provided to carry out
 "one-shot" compression between buffers and/or files. For finer
 control over the compression process, see the L</"OO Interface">
 section.
 
-    use IO::Compress::Xz qw(xz $XzError) ;
+    use IO::Compress::Lzip qw(lzip $LzipError) ;
 
-    xz $input_filename_or_reference => $output_filename_or_reference [,OPTS]
-        or die "xz failed: $XzError\n";
+    lzip $input_filename_or_reference => $output_filename_or_reference [,OPTS]
+        or die "lzip failed: $LzipError\n";
 
 The functional interface needs Perl5.005 or better.
 
-=head2 xz $input_filename_or_reference => $output_filename_or_reference [, OPTS]
+=head2 lzip $input_filename_or_reference => $output_filename_or_reference [, OPTS]
 
-C<xz> expects at least two parameters,
+C<lzip> expects at least two parameters,
 C<$input_filename_or_reference> and C<$output_filename_or_reference>.
 
 =head3 The C<$input_filename_or_reference> parameter
@@ -249,7 +262,7 @@ contains valid filenames before any data is compressed.
 =item An Input FileGlob string
 
 If C<$input_filename_or_reference> is a string that is delimited by the
-characters "<" and ">" C<xz> will assume that it is an
+characters "<" and ">" C<lzip> will assume that it is an
 I<input fileglob string>. The input is the list of files that match the
 fileglob.
 
@@ -293,7 +306,7 @@ the compressed data will be pushed onto the array.
 =item An Output FileGlob
 
 If C<$output_filename_or_reference> is a string that is delimited by the
-characters "<" and ">" C<xz> will assume that it is an
+characters "<" and ">" C<lzip> will assume that it is an
 I<output fileglob string>. The output is the list of files that match the
 fileglob.
 
@@ -317,7 +330,7 @@ in C<$output_filename_or_reference> as a concatenated series of compressed data 
 
 =head2 Optional Parameters
 
-Unless specified below, the optional parameters for C<xz>,
+Unless specified below, the optional parameters for C<lzip>,
 C<OPTS>, are the same as those used with the OO interface defined in the
 L</"Constructor Options"> section below.
 
@@ -326,10 +339,10 @@ L</"Constructor Options"> section below.
 =item C<< AutoClose => 0|1 >>
 
 This option applies to any input or output data streams to
-C<xz> that are filehandles.
+C<lzip> that are filehandles.
 
 If C<AutoClose> is specified, and the value is true, it will result in all
-input and/or output filehandles being closed once C<xz> has
+input and/or output filehandles being closed once C<lzip> has
 completed.
 
 This parameter defaults to 0.
@@ -388,67 +401,67 @@ Defaults to 0.
 =head2 Examples
 
 To read the contents of the file C<file1.txt> and write the compressed
-data to the file C<file1.txt.xz>.
+data to the file C<file1.txt.lz>.
 
     use strict ;
     use warnings ;
-    use IO::Compress::Xz qw(xz $XzError) ;
+    use IO::Compress::Lzip qw(lzip $LzipError) ;
 
     my $input = "file1.txt";
-    xz $input => "$input.xz"
-        or die "xz failed: $XzError\n";
+    lzip $input => "$input.lz"
+        or die "lzip failed: $LzipError\n";
 
 To read from an existing Perl filehandle, C<$input>, and write the
 compressed data to a buffer, C<$buffer>.
 
     use strict ;
     use warnings ;
-    use IO::Compress::Xz qw(xz $XzError) ;
+    use IO::Compress::Lzip qw(lzip $LzipError) ;
     use IO::File ;
 
     my $input = new IO::File "<file1.txt"
         or die "Cannot open 'file1.txt': $!\n" ;
     my $buffer ;
-    xz $input => \$buffer
-        or die "xz failed: $XzError\n";
+    lzip $input => \$buffer
+        or die "lzip failed: $LzipError\n";
 
 To compress all files in the directory "/my/home" that match "*.txt"
 and store the compressed data in the same directory
 
     use strict ;
     use warnings ;
-    use IO::Compress::Xz qw(xz $XzError) ;
+    use IO::Compress::Lzip qw(lzip $LzipError) ;
 
-    xz '</my/home/*.txt>' => '<*.xz>'
-        or die "xz failed: $XzError\n";
+    lzip '</my/home/*.txt>' => '<*.lz>'
+        or die "lzip failed: $LzipError\n";
 
 and if you want to compress each file one at a time, this will do the trick
 
     use strict ;
     use warnings ;
-    use IO::Compress::Xz qw(xz $XzError) ;
+    use IO::Compress::Lzip qw(lzip $LzipError) ;
 
     for my $input ( glob "/my/home/*.txt" )
     {
-        my $output = "$input.xz" ;
-        xz $input => $output
-            or die "Error compressing '$input': $XzError\n";
+        my $output = "$input.lz" ;
+        lzip $input => $output
+            or die "Error compressing '$input': $LzipError\n";
     }
 
 =head1 OO Interface
 
 =head2 Constructor
 
-The format of the constructor for C<IO::Compress::Xz> is shown below
+The format of the constructor for C<IO::Compress::Lzip> is shown below
 
-    my $z = new IO::Compress::Xz $output [,OPTS]
-        or die "IO::Compress::Xz failed: $XzError\n";
+    my $z = new IO::Compress::Lzip $output [,OPTS]
+        or die "IO::Compress::Lzip failed: $LzipError\n";
 
-It returns an C<IO::Compress::Xz> object on success and undef on failure.
-The variable C<$XzError> will contain an error message on failure.
+It returns an C<IO::Compress::Lzip> object on success and undef on failure.
+The variable C<$LzipError> will contain an error message on failure.
 
 If you are running Perl 5.005 or better the object, C<$z>, returned from
-IO::Compress::Xz can be used exactly like an L<IO::File|IO::File> filehandle.
+IO::Compress::Lzip can be used exactly like an L<IO::File|IO::File> filehandle.
 This means that all normal output file operations can be carried out
 with C<$z>.
 For example, to write to a compressed file/buffer you can use either of
@@ -481,7 +494,7 @@ in C<$$output>.
 
 =back
 
-If the C<$output> parameter is any other type, C<IO::Compress::Xz>::new will
+If the C<$output> parameter is any other type, C<IO::Compress::Lzip>::new will
 return undef.
 
 =head2 Constructor Options
@@ -494,7 +507,7 @@ C<OPTS> is any combination of the following options:
 
 This option is only valid when the C<$output> parameter is a filehandle. If
 specified, and the value is true, it will result in the C<$output> being
-closed once either the C<close> method is called or the C<IO::Compress::Xz>
+closed once either the C<close> method is called or the C<IO::Compress::Lzip>
 object is destroyed.
 
 This parameter defaults to 0.
@@ -529,33 +542,11 @@ to it.  Otherwise the file pointer will not be moved.
 
 This parameter defaults to 0.
 
-=item C<< Preset => $preset >>
+=item C<< DictSize => number >>
 
-Used to choose the compression preset.
+Valid values are between 4K and 128Meg
 
-Valid values are 0-9 and C<LZMA_PRESET_DEFAULT>.
-
-0 is the fastest compression with the lowest memory usage and the lowest
-compression.
-
-9 is the slowest compression with the highest memory usage but with the best
-compression.
-
-Defaults to C<LZMA_PRESET_DEFAULT> (6).
-
-=item C<< Extreme => 0|1 >>
-
-Makes the compression a lot slower, but a small compression gain.
-
-Defaults to 0.
-
-=item C<< Check => $check >>
-
-Used to specify the integrrity check used in the xz data stream.
-Valid values are C<LZMA_CHECK_NONE>, C<LZMA_CHECK_CRC32>,
-C<LZMA_CHECK_CRC64>, C<LZMA_CHECK_SHA256>.
-
-Defaults to C<LZMA_CHECK_CRC32>.
+Defaults to 8 Meg.
 
 =item C<< Strict => 0|1 >>
 
@@ -720,7 +711,7 @@ C<undef>.
 Flushes any pending compressed data and then closes the output file/buffer.
 
 For most versions of Perl this method will be automatically invoked if
-the IO::Compress::Xz object is destroyed (either explicitly or by the
+the IO::Compress::Lzip object is destroyed (either explicitly or by the
 variable with the reference to the object going out of scope). The
 exceptions are Perl versions 5.005 through 5.00504 and 5.8.0. In
 these cases, the C<close> method will be called automatically, but
@@ -733,7 +724,7 @@ closing.
 
 Returns true on success, otherwise 0.
 
-If the C<AutoClose> option has been enabled when the IO::Compress::Xz
+If the C<AutoClose> option has been enabled when the IO::Compress::Lzip
 object was created, and the object is associated with a file, the
 underlying file will also be closed.
 
@@ -752,16 +743,16 @@ See the L</"Constructor Options"> section for more details.
 
 =head1 Importing
 
-No symbolic constants are required by this IO::Compress::Xz at present.
+No symbolic constants are required by this IO::Compress::Lzip at present.
 
 =over 5
 
 =item :all
 
-Imports C<xz> and C<$XzError>.
+Imports C<lzip> and C<$LzipError>.
 Same as doing this
 
-    use IO::Compress::Xz qw(xz $XzError) ;
+    use IO::Compress::Lzip qw(lzip $LzipError) ;
 
 =back
 
@@ -769,7 +760,7 @@ Same as doing this
 
 =head1 SEE ALSO
 
-L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzip>, L<IO::Uncompress::UnLzip>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Compress::Zstd>, L<IO::Uncompress::UnZstd>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
+L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Uncompress::UnLzip>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Compress::Zstd>, L<IO::Uncompress::UnZstd>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
 
 L<IO::Compress::FAQ|IO::Compress::FAQ>
 

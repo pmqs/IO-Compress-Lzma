@@ -17,7 +17,7 @@ BEGIN {
     $extra = 1
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
-    plan tests => 4420 + $extra;
+    plan tests => 3700 + $extra;
 
 };
 
@@ -25,12 +25,12 @@ BEGIN {
 #use Test::More skip_all => "not implemented yet";
 
 
-use IO::Compress::Xz   qw($XzError) ;
-use IO::Uncompress::UnXz qw($UnXzError) ;
+use IO::Compress::Lzip   qw($LzipError) ;
+use IO::Uncompress::UnLzip qw($UnLzipError) ;
 
 sub identify
 {
-    'IO::Compress::Xz';
+    'IO::Compress::Lzip';
 }
 
 require "truncate.pl" ;

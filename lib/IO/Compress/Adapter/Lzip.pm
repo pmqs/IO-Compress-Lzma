@@ -1,4 +1,4 @@
-package IO::Compress::Adapter::Xz ;
+package IO::Compress::Adapter::Lzip ;
 
 use strict;
 use warnings;
@@ -6,28 +6,34 @@ use bytes;
 
 use IO::Compress::Base::Common  2.084 qw(:Status);
 
-use Compress::Raw::Lzma  2.084 qw(LZMA_OK LZMA_STREAM_END LZMA_PRESET_DEFAULT LZMA_CHECK_CRC32) ;
+use Compress::Raw::Lzma  2.084 qw(LZMA_OK LZMA_STREAM_END) ;
+use Compress::Raw::Zlib 2.084 qw() ;
 
 our ($VERSION);
 $VERSION = '2.084';
 
+
+
 sub mkCompObject
 {
-    my $Preset = shift ;
-    my $Extreme = shift ;
-    my $Check  = shift ;
+    my $dictSize = shift ;
 
-    my ($def, $status) = Compress::Raw::Lzma::EasyEncoder->new(AppendOutput => 1, 
-                                                               Preset => $Preset,
-                                                               Extreme => $Extreme,
-                                                               Check => $Check);
+    my $filter = Lzma::Filter::Lzma1(DictSize => $dictSize);
 
-    return (undef, "Could not create EasyEncoder object: $status", $status)
+    my ($def, $status) =
+    Compress::Raw::Lzma::RawEncoder->new(AppendOutput => 1,
+                                         ForZip => 0,
+                                         Filter => $filter,
+                                         #Filter => Lzma::Filter::Lzma1m
+                                         );
+
+    return (undef, "Could not create RawEncoder object: $status", $status)
         if $status != LZMA_OK ;
 
     return bless {'Def'        => $def,
                   'Error'      => '',
                   'ErrorNo'    => 0,
+                  'CRC32'      => 0,
                  }  ;     
 }
 
@@ -36,6 +42,8 @@ sub compr
     my $self = shift ;
 
     my $def   = $self->{Def};
+
+    $self->{CRC32} = Compress::Raw::Zlib::crc32($_[0], $self->{CRC32}) ;
 
     my $status = $def->code($_[0], $_[1]) ;
     $self->{ErrorNo} = $status;
@@ -98,7 +106,8 @@ sub reset
 
     my $outer = $self->{Outer};
 
-    my ($def, $status) = Compress::Raw::Lzma->lzma_easy_encoder();
+    my ($def, $status) = 
+        Compress::Raw::Lzma::RawEncoder->new(AppendOutput => 1);
     $self->{ErrorNo} = ($status == LZMA_OK) ? 0 : $status ;
 
     if ($status != LZMA_OK)
@@ -136,21 +145,19 @@ sub uncompressedBytes
 #    my $self = shift ;
 #    $self->{Def}->total_in();
 #}
-#
-#sub crc32
-#{
-#    my $self = shift ;
-#    $self->{Def}->crc32();
-#}
-#
-#sub adler32
-#{
-#    my $self = shift ;
-#    $self->{Def}->adler32();
-#}
+
+sub crc32
+{
+   my $self = shift ;
+   return $self->{CRC32} ;
+}
+
 
 
 1;
 
 __END__
+
+
+
 

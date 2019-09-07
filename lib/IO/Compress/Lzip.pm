@@ -194,7 +194,6 @@ IO::Compress::Lzip - Write lzip files/buffers
     binmode $z
     fileno $z
     close $z ;
- 
 
 =head1 DESCRIPTION
 
@@ -221,7 +220,8 @@ The functional interface needs Perl5.005 or better.
 =head2 lzip $input_filename_or_reference => $output_filename_or_reference [, OPTS]
 
 C<lzip> expects at least two parameters,
-C<$input_filename_or_reference> and C<$output_filename_or_reference>.
+C<$input_filename_or_reference> and C<$output_filename_or_reference>
+and zero or more optional parameters (see L</Optional Parameters>)
 
 =head3 The C<$input_filename_or_reference> parameter
 
@@ -330,9 +330,9 @@ in C<$output_filename_or_reference> as a concatenated series of compressed data 
 
 =head2 Optional Parameters
 
-Unless specified below, the optional parameters for C<lzip>,
-C<OPTS>, are the same as those used with the OO interface defined in the
-L</"Constructor Options"> section below.
+The optional parameters for the one-shot function C<lzip>
+are (for the most part) identical to those used with the OO interface defined in the
+L</"Constructor Options"> section. The exceptions are listed below
 
 =over 5
 
@@ -400,6 +400,22 @@ Defaults to 0.
 
 =head2 Examples
 
+Here are a few example that show the capabilities of the module.
+
+=head3 Streaming
+
+This very simple command line example demonstrates the streaming capabilities of the module.
+The code reads data from STDIN, compresses it, and writes the compressed data to STDOUT.
+
+    $ echo hello world | perl -MIO::Compress::Lzip=lzip -e 'lzip \*STDIN => \*STDOUT' >output.lz
+
+The special filename "-" can be used as a standin for both C<\*STDIN> and C<\*STDOUT>,
+so the above can be rewritten as
+
+    $ echo hello world | perl -MIO::Compress::Lzip=lzip -e 'lzip "-" => "-"' >output.lz
+
+=head3 Compressing a file from the filesystem
+
 To read the contents of the file C<file1.txt> and write the compressed
 data to the file C<file1.txt.lz>.
 
@@ -410,6 +426,8 @@ data to the file C<file1.txt.lz>.
     my $input = "file1.txt";
     lzip $input => "$input.lz"
         or die "lzip failed: $LzipError\n";
+
+=head3 Reading from a Filehandle and writing to an in-memory buffer
 
 To read from an existing Perl filehandle, C<$input>, and write the
 compressed data to a buffer, C<$buffer>.
@@ -424,6 +442,8 @@ compressed data to a buffer, C<$buffer>.
     my $buffer ;
     lzip $input => \$buffer
         or die "lzip failed: $LzipError\n";
+
+=head3 Compressing multiple files
 
 To compress all files in the directory "/my/home" that match "*.txt"
 and store the compressed data in the same directory
@@ -499,7 +519,7 @@ return undef.
 
 =head2 Constructor Options
 
-C<OPTS> is any combination of the following options:
+C<OPTS> is any combination of zero or more the following options:
 
 =over 5
 

@@ -28,3 +28,4 @@ install:
   - cpan Compress::Raw::Lzma
   - cpan Compress::Raw::Zlib 
   - cpan Compress::Raw::Bzip2
+  - cpan IO::Compress::Zip

@@ -60,6 +60,7 @@ sub mkUncompZipObject
                   'UnCompSize'    => 0,
                   'Error'         => '',
                   'ConsumesInput' => 1,
+                  'ResetData'     => $properties,       
                   #'CompressedLen' => $CompressedLength || 0,
                   #'UncompressedLen' => $UncompressedLength || 0,
                  }  ;     
@@ -95,7 +96,8 @@ sub reset
 {
     my $self = shift ;
 
-    my ($inf, $status) = Compress::Raw::Lzma::AloneDecoder->new(AppendOutput => 1,
+    my ($inf, $status) = Compress::Raw::Lzma::RawDecoder->new(AppendOutput => 1,
+                                              Properties => $self->{'ResetData'},
                                               ConsumeInput => 1, 
                                               LimitOutput => 1);
     $self->{ErrorNo} = ($status == LZMA_OK) ? 0 : $status ;

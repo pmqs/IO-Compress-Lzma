@@ -151,22 +151,6 @@ sub isLzma
     
 
     return '';
-
-#    my $magic ;
-#    $self->smartReadExact(\$magic, 4);
-#
-#    *$self->{HeaderPending} = $magic ;
-#    
-#    return $self->HeaderError("Header size is " . 
-#                                        4 . " bytes") 
-#        if length $magic != 4;
-#
-#    return $self->HeaderError("Bad Magic.")
-#        if ! isBzip2Magic($magic) ;
-#                      
-#        
-#    *$self->{Type} = 'bzip2';
-#    return $magic;
 }
 
 

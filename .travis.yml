@@ -26,8 +26,8 @@ install:
   - perl -V
   - cpan-install --deps
   # Force latest version of these modules
-  #- cpan Scalar::Util
-  #- cpan Compress::Raw::Zlib 
-  #- cpan Compress::Raw::Bzip2
-  #- cpan Compress::Raw::Lzma
-  #- cpan IO::Compress::Base
+  - cpan Scalar::Util
+  - cpan Compress::Raw::Zlib 
+  - cpan Compress::Raw::Bzip2
+  - cpan Compress::Raw::Lzma
+  - cpan IO::Compress::Base

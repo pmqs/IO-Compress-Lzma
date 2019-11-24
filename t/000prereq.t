@@ -60,8 +60,6 @@ BEGIN
 
     my @results = ( [ 'perl', $] ] );
     my @modules = qw(
-                    Archive::Zip::SimpleZip
-                    Archive::Zip::SimpleUnzip
                     IO::Compress::Base
                     IO::Compress::Zip
                     IO::Compress::Lzma

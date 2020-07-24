@@ -17,7 +17,7 @@ sub mkCompObject
     my $Extreme = shift ;
     my $Check  = shift ;
 
-    my ($def, $status) = Compress::Raw::Lzma::EasyEncoder->new(AppendOutput => 1, 
+    my ($def, $status) = Compress::Raw::Lzma::EasyEncoder->new(AppendOutput => 1,
                                                                Preset => $Preset,
                                                                Extreme => $Extreme,
                                                                Check => $Check);
@@ -28,7 +28,7 @@ sub mkCompObject
     return bless {'Def'        => $def,
                   'Error'      => '',
                   'ErrorNo'    => 0,
-                 }  ;     
+                 }  ;
 }
 
 sub compr
@@ -42,13 +42,13 @@ sub compr
 
     if ($status != LZMA_OK)
     {
-        $self->{Error} = "Deflate Error: $status"; 
+        $self->{Error} = "Deflate Error: $status";
         return STATUS_ERROR;
     }
 
     #${ $_[1] } .= $out if defined $out;
 
-    return STATUS_OK;    
+    return STATUS_OK;
 }
 
 sub flush
@@ -62,13 +62,13 @@ sub flush
 
     if ($status != LZMA_STREAM_END)
     {
-        $self->{Error} = "Deflate Error: $status"; 
+        $self->{Error} = "Deflate Error: $status";
         return STATUS_ERROR;
     }
 
     #${ $_[0] } .= $out if defined $out ;
-    return STATUS_OK;    
-    
+    return STATUS_OK;
+
 }
 
 sub close
@@ -82,13 +82,13 @@ sub close
 
     if ($status != LZMA_STREAM_END)
     {
-        $self->{Error} = "Deflate Error: $status"; 
+        $self->{Error} = "Deflate Error: $status";
         return STATUS_ERROR;
     }
 
     #${ $_[0] } .= $out if defined $out ;
-    return STATUS_OK;    
-    
+    return STATUS_OK;
+
 }
 
 
@@ -103,13 +103,13 @@ sub reset
 
     if ($status != LZMA_OK)
     {
-        $self->{Error} = "Cannot create Deflate object: $status"; 
+        $self->{Error} = "Cannot create Deflate object: $status";
         return STATUS_ERROR;
     }
 
     $self->{Def} = $def;
 
-    return STATUS_OK;    
+    return STATUS_OK;
 }
 
 sub compressedBytes
@@ -153,4 +153,3 @@ sub uncompressedBytes
 1;
 
 __END__
-

@@ -154,7 +154,8 @@ for my $stream (0, 1)
             my $file2;
             my $zipfile;
             my $lex = new LexFile $file1, $file2, $zipfile;
-
+            # use feature 'state'; use v5.10;
+            # state $x = 0 ; $zipfile = "/tmp/z$x-xz.zip" ; ++$x;
             my $content1 = "hello ";
             writeFile($file1, $content1);
 

@@ -1,6 +1,11 @@
 CHANGES
 -------
 
+  2.096 31 July 2020
+
+      * Add test for Zip with XZ compresion
+        5a96ca1ffdd1c7ab57f121c78135371e9272d6e0
+
   2.095 19 July 2020
 
       * No changes

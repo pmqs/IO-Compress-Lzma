@@ -55,6 +55,8 @@ t/110encode-xz.t
 t/110encode-lzip.t
 t/25interop-io-string.t
 t/999pod.t
+t/files/lorem.txt
+t/files/winzip-eq-xz.zip
 t/meta-json.t
 t/meta-yaml.t
 t/Test/Builder.pm

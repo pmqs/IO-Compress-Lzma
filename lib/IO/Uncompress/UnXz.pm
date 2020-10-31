@@ -39,7 +39,7 @@ sub unxz
 our %PARAMS = (
         'memlimit' => [IO::Compress::Base::Common::Parse_unsigned, 128 * 1024 * 1024],
         'flags'    => [IO::Compress::Base::Common::Parse_boolean,  0],
-    );    
+    );
 
 sub getExtraParams
 {
@@ -74,7 +74,7 @@ sub mkUncomp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     *$self->{Uncomp} = $obj;
 
     return 1;
@@ -93,15 +93,15 @@ sub ckMagic
     $self->smartReadExact(\$magic, XZ_ID_SIZE);
 
     *$self->{HeaderPending} = $magic ;
-    
-    return $self->HeaderError("Header size is " . 
-                                        XZ_ID_SIZE . " bytes") 
+
+    return $self->HeaderError("Header size is " .
+                                        XZ_ID_SIZE . " bytes")
         if length $magic != XZ_ID_SIZE;
 
     return $self->HeaderError("Bad Magic.")
         if ! isXzMagic($magic) ;
-                      
-        
+
+
     *$self->{Type} = 'xz';
     return $magic;
 }
@@ -122,7 +122,7 @@ sub readHeader
         'TrailerLength'     => 0,
         'Header'            => '$magic'
         };
-    
+
 }
 
 sub chkTrailer
@@ -912,4 +912,3 @@ Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

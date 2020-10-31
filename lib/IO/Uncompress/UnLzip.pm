@@ -74,7 +74,7 @@ sub mkUncomp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     *$self->{Uncomp} = $obj;
 
     return 1;
@@ -90,9 +90,9 @@ sub ckMagic
 
     *$self->{HeaderPending} = $magic ;
 
-    return $self->HeaderError("Minimum header size is " . 
-                              4 . " bytes") 
-        if length $magic != 4 ;                                    
+    return $self->HeaderError("Minimum header size is " .
+                              4 . " bytes")
+        if length $magic != 4 ;
 
     return $self->HeaderError("Bad Magic")
         if $magic ne 'LZIP' ;
@@ -111,7 +111,7 @@ sub readHeader
     my ($buffer) = '' ;
 
     $self->smartReadExact(\$buffer, 2)
-        or return $self->HeaderError("Minimum header size is " . 
+        or return $self->HeaderError("Minimum header size is " .
                                      2 . " bytes") ;
 
     my $keep = $magic . $buffer ;
@@ -143,8 +143,8 @@ sub readHeader
         'TrailerLength'     => $VN ? 20 : 12,
         'Header'            => $keep,
         'Version'           => $VN,
-        'DictSize'          => $dicsize, 
-        };    
+        'DictSize'          => $dicsize,
+        };
 }
 
 sub chkTrailer
@@ -153,7 +153,7 @@ sub chkTrailer
     my $trailer = shift;
 
     my $not_version_0 = *$self->{Info}{Version} != 0;
-    # Check CRC & ISIZE 
+    # Check CRC & ISIZE
     my $CRC32 = unpack("V", $trailer) ;
     my $uSize = U64::newUnpack_V64 substr($trailer,  4, 8);
     my $mSize;
@@ -164,23 +164,23 @@ sub chkTrailer
 
     }
 
-    *$self->{Info}{CRC32} = $CRC32;    
-    *$self->{Info}{UncompressedLength} = $uSize->get64bit(); 
-    
+    *$self->{Info}{CRC32} = $CRC32;
+    *$self->{Info}{UncompressedLength} = $uSize->get64bit();
+
     if (*$self->{Strict}) {
         return $self->TrailerError("CRC mismatch")
             if $CRC32 != *$self->{Uncomp}->crc32() ;
 
-        return $self->TrailerError("USIZE mismatch.")        
-            if ! $uSize->equal(*$self->{UnCompSize});   
+        return $self->TrailerError("USIZE mismatch.")
+            if ! $uSize->equal(*$self->{UnCompSize});
 
         if ($not_version_0)
         {
             $mSize->subtract(6 + 20); # header & trailer
 
             return $self->TrailerError("CSIZE mismatch.")
-                if ! $mSize->equal(*$self->{CompSize}); 
-        }                    
+                if ! $mSize->equal(*$self->{CompSize});
+        }
     }
 
     return STATUS_OK;
@@ -953,4 +953,3 @@ Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

@@ -68,7 +68,7 @@ sub mkUncomp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     *$self->{Uncomp} = $obj;
 
     *$self->{Info} = $self->ckMagic()
@@ -106,14 +106,14 @@ sub isLzma
 
     my $buffer = '';
 
-    $self->smartRead(\$buffer, *$self->{BlockSize}) >= 0  
+    $self->smartRead(\$buffer, *$self->{BlockSize}) >= 0
         or return $self->saveErrorString(undef, "No data to read");
 
     my $temp_buf = $magic . $buffer ;
-    *$self->{HeaderPending} = $temp_buf ;    
+    *$self->{HeaderPending} = $temp_buf ;
     $buffer = '';
     my $status = *$self->{Uncomp}->uncompr(\$temp_buf, \$buffer, $self->smartEof()) ;
-    
+
     return $self->saveErrorString(undef, *$self->{Uncomp}{Error}, STATUS_ERROR)
         if $status == STATUS_ERROR;
 
@@ -121,12 +121,12 @@ sub isLzma
 
     return $self->saveErrorString(undef, "unexpected end of file", STATUS_ERROR)
         if $self->smartEof() && $status != STATUS_ENDSTREAM;
-            
+
     #my $buf_len = *$self->{Uncomp}->uncompressedBytes();
     my $buf_len = length $buffer;
 
     if ($status == STATUS_ENDSTREAM) {
-        if (*$self->{MultiStream} 
+        if (*$self->{MultiStream}
                     && (length $temp_buf || ! $self->smartEof())){
             *$self->{NewStream} = 1 ;
             *$self->{EndStream} = 0 ;
@@ -135,9 +135,9 @@ sub isLzma
             *$self->{EndStream} = 1 ;
         }
     }
-    *$self->{HeaderPending} = $buffer ;    
-    *$self->{InflatedBytesRead} = $buf_len ;    
-    *$self->{TotalInflatedBytesRead} += $buf_len ;    
+    *$self->{HeaderPending} = $buffer ;
+    *$self->{InflatedBytesRead} = $buf_len ;
+    *$self->{TotalInflatedBytesRead} += $buf_len ;
     *$self->{Type} = 'lzma';
 
     $self->saveStatus(STATUS_OK);
@@ -148,7 +148,7 @@ sub isLzma
         'TrailerLength' => 0,
         'Header'        => ''
         };
-    
+
 
     return '';
 }
@@ -170,7 +170,7 @@ sub readHeader
         'TrailerLength'     => 0,
         'Header'            => ''
         };
-    
+
 }
 
 sub chkTrailer
@@ -945,4 +945,3 @@ Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

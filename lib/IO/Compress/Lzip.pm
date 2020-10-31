@@ -38,7 +38,7 @@ sub lzip
 }
 
 
-sub mkHeader 
+sub mkHeader
 {
     my $self = shift ;
     my $opts = shift ;
@@ -56,17 +56,17 @@ sub mkHeader
     $self->saveErrorString(undef, "Unacceptable dictionary size for lzip: $dict_size")
         if $dict_size < (1 << 12) || $dict_size > (1 << 27) ;
 
-    for ($log2dic = 27; $log2dic >= 12; $log2dic--) 
+    for ($log2dic = 27; $log2dic >= 12; $log2dic--)
     {
         last
             if $dict_size & (1 << $log2dic) ;
     }
 
-    if ($dict_size > (1 << $log2dic)) 
+    if ($dict_size > (1 << $log2dic))
     {
         ++ $log2dic ;
         $wedges =  ((1 << $log2dic) - $dict_size) / (1 << ($log2dic - 4));
-    } 
+    }
     else
     {
         $wedges = 0;
@@ -106,7 +106,7 @@ sub mkComp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     return $obj;
 }
 
@@ -117,8 +117,8 @@ sub mkTrailer
     *$self->{CompSize}->add( 6 + 20);   # Compressed size + header + trailer
 
     return pack("V", *$self->{Compress}->crc32() ) .
-         *$self->{UnCompSize}->getPacked_V64() . # Uncompressed size                       
-                       
+         *$self->{UnCompSize}->getPacked_V64() . # Uncompressed size
+
          *$self->{CompSize}->getPacked_V64() ;   # Compressed size
 }
 
@@ -144,7 +144,7 @@ sub getFileInfo
     my $self = shift ;
     my $params = shift;
     my $file = shift ;
-    
+
 }
 
 1;
@@ -808,4 +808,3 @@ Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

@@ -42,7 +42,7 @@ sub xz
 }
 
 
-sub mkHeader 
+sub mkHeader
 {
     my $self = shift ;
     return '';
@@ -67,7 +67,7 @@ sub ckParams
     my $got = shift;
 
     # TODO - validate the parameters
-    
+
     return 1 ;
 }
 
@@ -77,7 +77,7 @@ sub mkComp
     my $self = shift ;
     my $got = shift ;
 
-    my ($obj, $errstr, $errno) 
+    my ($obj, $errstr, $errno)
         = IO::Compress::Adapter::Xz::mkCompObject($got->getValue('preset'),
                                                   $got->getValue('extreme'),
                                                   $got->getValue('check')
@@ -85,7 +85,7 @@ sub mkComp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     return $obj;
 }
 
@@ -117,7 +117,7 @@ sub getFileInfo
     my $self = shift ;
     my $params = shift;
     my $file = shift ;
-    
+
 }
 
 1;
@@ -803,4 +803,3 @@ Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

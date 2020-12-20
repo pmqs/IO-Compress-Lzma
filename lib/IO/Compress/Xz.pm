@@ -135,7 +135,7 @@ IO::Compress::Xz - Write xz files/buffers
     my $status = xz $input => $output [,OPTS]
         or die "xz failed: $XzError\n";
 
-    my $z = new IO::Compress::Xz $output [,OPTS]
+    my $z = IO::Compress::Xz->new( $output [,OPTS] )
         or die "xz failed: $XzError\n";
 
     $z->print($string);
@@ -410,7 +410,7 @@ compressed data to a buffer, C<$buffer>.
     use IO::Compress::Xz qw(xz $XzError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt"
+    my $input = IO::File->new( "<file1.txt" )
         or die "Cannot open 'file1.txt': $!\n" ;
     my $buffer ;
     xz $input => \$buffer
@@ -447,7 +447,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for C<IO::Compress::Xz> is shown below
 
-    my $z = new IO::Compress::Xz $output [,OPTS]
+    my $z = IO::Compress::Xz->new( $output [,OPTS] )
         or die "IO::Compress::Xz failed: $XzError\n";
 
 It returns an C<IO::Compress::Xz> object on success and undef on failure.

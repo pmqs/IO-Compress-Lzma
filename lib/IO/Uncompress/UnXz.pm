@@ -154,7 +154,7 @@ IO::Uncompress::UnXz - Read xz files/buffers
     my $status = unxz $input => $output [,OPTS]
         or die "unxz failed: $UnXzError\n";
 
-    my $z = new IO::Uncompress::UnXz $input [OPTS]
+    my $z = IO::Uncompress::UnXz->new( $input [OPTS] )
         or die "unxz failed: $UnXzError\n";
 
     $status = $z->read($buffer)
@@ -445,7 +445,7 @@ uncompressed data to a buffer, C<$buffer>.
     use IO::Uncompress::UnXz qw(unxz $UnXzError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt.xz"
+    my $input = IO::File->new( "<file1.txt.xz" )
         or die "Cannot open 'file1.txt.xz': $!\n" ;
     my $buffer ;
     unxz $input => \$buffer
@@ -480,7 +480,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for IO::Uncompress::UnXz is shown below
 
-    my $z = new IO::Uncompress::UnXz $input [OPTS]
+    my $z = IO::Uncompress::UnXz->new( $input [OPTS] )
         or die "IO::Uncompress::UnXz failed: $UnXzError\n";
 
 Returns an C<IO::Uncompress::UnXz> object on success and undef on failure.

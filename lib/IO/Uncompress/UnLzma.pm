@@ -195,7 +195,7 @@ IO::Uncompress::UnLzma - Read lzma files/buffers
     my $status = unlzma $input => $output [,OPTS]
         or die "unlzma failed: $UnLzmaError\n";
 
-    my $z = new IO::Uncompress::UnLzma $input [OPTS]
+    my $z = IO::Uncompress::UnLzma->new( $input [OPTS] )
         or die "unlzma failed: $UnLzmaError\n";
 
     $status = $z->read($buffer)
@@ -486,7 +486,7 @@ uncompressed data to a buffer, C<$buffer>.
     use IO::Uncompress::UnLzma qw(unlzma $UnLzmaError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt.lzma"
+    my $input = IO::File->new( "<file1.txt.lzma" )
         or die "Cannot open 'file1.txt.lzma': $!\n" ;
     my $buffer ;
     unlzma $input => \$buffer
@@ -521,7 +521,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for IO::Uncompress::UnLzma is shown below
 
-    my $z = new IO::Uncompress::UnLzma $input [OPTS]
+    my $z = IO::Uncompress::UnLzma->new( $input [OPTS] )
         or die "IO::Uncompress::UnLzma failed: $UnLzmaError\n";
 
 Returns an C<IO::Uncompress::UnLzma> object on success and undef on failure.

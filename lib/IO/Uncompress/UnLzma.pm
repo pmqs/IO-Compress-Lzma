@@ -464,7 +464,7 @@ C<InputLength> option.
 
 =back
 
-=head2 Examples
+=head2 OneShot Examples
 
 To read the contents of the file C<file1.txt.lzma> and write the
 uncompressed data to the file C<file1.txt>.
@@ -524,6 +524,9 @@ The format of the constructor for IO::Uncompress::UnLzma is shown below
     my $z = IO::Uncompress::UnLzma->new( $input [OPTS] )
         or die "IO::Uncompress::UnLzma failed: $UnLzmaError\n";
 
+The constructor takes one mandatory parameter, C<$input>, defined below, and
+zero or more C<OPTS>, defined in L<Constructor Options>.
+
 Returns an C<IO::Uncompress::UnLzma> object on success and undef on failure.
 The variable C<$UnLzmaError> will contain an error message on failure.
 
@@ -535,6 +538,20 @@ use either of these forms
 
     $line = $z->getline();
     $line = <$z>;
+
+Below is a simple exaple of using the OO interface to read the compressed file
+C<myfile.lzma> and write its contents to stdout.
+
+    my $filename = "myfile.lzma";
+    my $z = IO::Uncompress::UnLzma->new($filename)
+        or die "IO::Uncompress::UnLzma failed: $UnLzmaError\n";
+
+    while (<$z>) {
+        print $_;
+    }
+    $z->close();
+
+See L</EXAMPLES> for further examples
 
 The mandatory parameter C<$input> is used to determine the source of the
 compressed data. This parameter can take one of three forms.
@@ -656,10 +673,6 @@ carried out, when Strict is off they are not.
 The default for this option is off.
 
 =back
-
-=head2 Examples
-
-TODO
 
 =head1 Methods
 

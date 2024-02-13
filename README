@@ -1,7 +1,7 @@
 
                             IO-Compress-Lzma
 
-                         Version 2.206
+                              Version 2.206
 
                                25 July 2023
 
@@ -88,9 +88,10 @@ To help me help you, I need all of the following information:
 
  2. If you are having problems building IO-Compress-Lzma, send me a
     complete log of what happened. Start by unpacking the IO-Compress-Lzma
-    module into a fresh directory and keep a log of all the steps
+    module into a fresh directory and keep a log of all the steps, including
+    the setting of configuration environment variables (if applicable).
 
-        [edit config.in, if necessary]
+        [edit config.in or set environment varialbes, if necessary]
         perl Makefile.PL
         make
         make test TEST_VERBOSE=1

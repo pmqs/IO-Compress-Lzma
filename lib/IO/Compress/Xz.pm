@@ -572,7 +572,7 @@ Defaults to 0.
 
 =item C<< Check => $check >>
 
-Used to specify the integrrity check used in the xz data stream.
+Used to specify the integrity check used in the xz data stream.
 Valid values are C<LZMA_CHECK_NONE>, C<LZMA_CHECK_CRC32>,
 C<LZMA_CHECK_CRC64>, C<LZMA_CHECK_SHA256>.
 

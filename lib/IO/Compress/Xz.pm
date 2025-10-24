@@ -20,7 +20,7 @@ $XzError = '';
 @EXPORT_OK = qw( $XzError xz ) ;
 %EXPORT_TAGS = %IO::Compress::Base::EXPORT_TAGS ;
 
-push @{ $EXPORT_TAGS{constants} }, @Compress::Raw::Lzma::EXPORT;
+$EXPORT_TAGS{constants} = [ defined $EXPORT_TAGS{constants} ? @{ $EXPORT_TAGS{constants} } : (), @Compress::Raw::Lzma::EXPORT] ;
 $EXPORT_TAGS{all} = $EXPORT_TAGS{constants} ;
 
 push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;

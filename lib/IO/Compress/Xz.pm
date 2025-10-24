@@ -5,15 +5,15 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.213 ;
-use IO::Compress::Base::Common  2.213 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Xz 2.213 ;
-use Compress::Raw::Lzma  2.213 ;
+use IO::Compress::Base 2.214 ;
+use IO::Compress::Base::Common  2.214 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Xz 2.214 ;
+use Compress::Raw::Lzma  2.214 ;
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $XzError);
 
-$VERSION = '2.213';
+$VERSION = '2.214';
 $XzError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -572,7 +572,7 @@ Defaults to 0.
 
 =item C<< Check => $check >>
 
-Used to specify the integrity check used in the xz data stream.
+Used to specify the integrrity check used in the xz data stream.
 Valid values are C<LZMA_CHECK_NONE>, C<LZMA_CHECK_CRC32>,
 C<LZMA_CHECK_CRC64>, C<LZMA_CHECK_SHA256>.
 
@@ -859,7 +859,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2024 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2025 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

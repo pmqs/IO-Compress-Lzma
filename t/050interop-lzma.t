@@ -122,6 +122,14 @@ BEGIN
 }
 
 {
+    # Delete environment variables used by lzip that could impact the running of the test
+    for my $var (qw( XZ_DEFAULTS XZ_OPT ))
+    {
+        delete $ENV{$var};
+    }
+}
+
+{
     title "Test interop with $LZMA" ;
 
     my ($file, $file1);

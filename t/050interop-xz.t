@@ -118,6 +118,14 @@ BEGIN
 }
 
 {
+    # Delete environment variables used by xz that could impact the running of the test
+    for my $var (qw( XZ_DEFAULTS XZ_OPT ))
+    {
+        delete $ENV{$var};
+    }
+}
+
+{
     title "Test interop with $XZ" ;
 
     my ($file, $file1);
